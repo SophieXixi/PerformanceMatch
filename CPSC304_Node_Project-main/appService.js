@@ -85,6 +85,15 @@ async function fetchDemotableFromDb() {
     });
 }
 
+async function fetchPerformerFromDb() {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute('SELECT * FROM PERFORMER');
+        return result.rows;
+    }).catch(() => {
+        return [];
+    });
+}
+
 async function initiateDemotable() {
     return await withOracleDB(async (connection) => {
         try {
@@ -105,11 +114,66 @@ async function initiateDemotable() {
     });
 }
 
+async function initiatePerformer() {
+    return await withOracleDB(async (connection) => {
+        try {
+            await connection.execute(`DROP TABLE PERFORMER`);
+        } catch(err) {
+            console.log('Table might not exist, proceeding to create...');
+        }
+
+        const result = await connection.execute(`
+            CREATE TABLE PERFORMER (
+                performerID INTEGER,
+                performer_name VARCHAR(20) NOT NULL,
+                debut_year INTEGER,
+                num_fans INTEGER,
+                groupID INTEGER NOT NULL,
+                PRIMARY KEY (performerID),
+                FOREIGN KEY (groupID) REFERENCES Group(groupID)
+                    ON DELETE SET DEFAULT
+                    ON UPDATE CASCADE
+            )
+        `);
+        return true;
+    }).catch(() => {
+        return false;
+    });
+}
+
 async function insertDemotable(id, name) {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
             `INSERT INTO DEMOTABLE (id, name) VALUES (:id, :name)`,
             [id, name],
+            { autoCommit: true }
+        );
+
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+        return false;
+    });
+}
+
+async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `INSERT INTO PERFORMER VALUES (:id, :name, :debutYear, :numOfFans, :groupId)`,
+            [id, name, debutYear, numOfFans, groupId],
+            { autoCommit: true }
+        );
+
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+        return false;
+    });
+}
+
+//TODO
+async function selectPerformer() {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            'SELECT * FROM PERFORMER WHERE ',
             { autoCommit: true }
         );
 
@@ -145,8 +209,12 @@ async function countDemotable() {
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
-    initiateDemotable, 
-    insertDemotable, 
+    fetchPerformerFromDb,
+    initiateDemotable,
+    initiatePerformer,
+    insertDemotable,
+    insertPerformer,
+    selectPerformer,
     updateNameDemotable, 
     countDemotable
 };

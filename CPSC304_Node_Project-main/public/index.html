@@ -39,6 +39,24 @@
         </tbody>
     </table>
 
+    <!-- Show 'Performer'.
+    Data will be fetched and inserted here dynamically using JavaScript. -->
+    <h2>Show Performer</h2>
+    <table id="performer" border="1">
+        <thead>
+        <tr>
+            <!--Table head, need to be adjusted accordingly to align with your own.-->
+            <th>ID</th>
+            <th>Name</th>
+            <th>Debut Year</th>
+            <th>Number of Fans</th>
+            <th>Group ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
     <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Reset Demotable</h2>
@@ -46,6 +64,12 @@
     <button id="resetDemotable"> reset </button> <br>
     <!-- A placeholder to display messages related to the reset operation. -->
     <div id="resetResultMsg"></div>
+
+    <h2>Reset Performer Table</h2>
+    <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
+    <button id="resetPerformer"> reset </button> <br>
+    <!-- A placeholder to display messages related to the reset operation. -->
+    <div id="resetPerformerResultMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->
 
@@ -57,6 +81,24 @@
         <button type="submit"> insert </button> <br>
     </form>
     <div id="insertResultMsg"></div>
+
+    <h2> Insert Values into Performer Table </h2>
+    <form id="insertPerformer">
+
+        ID: <input type="number" id="insertPerformerId" placeholder="Enter ID" required> <br><br>
+        Name: <input type="text" id="insertPerformerName" placeholder="Enter Name" maxlength="20"> <br><br>
+        Debut Year (Optional): <input type="number" id="insertDebutYear" placeholder="Enter Debut Year"> <br><br>
+        Number of Fans (Optional): <input type="number" id="insertNumOfFans" placeholder="Enter Number of Fans"> <br><br>
+        Group ID: <input type="number" id="insertGroupId" placeholder="Enter Group ID" required> <br><br>
+        <button type="submit"> insert </button> <br>
+    </form>
+    <div id="insertPerformerResultMsg"></div>
+
+    <h2> Select Performer </h2>
+    <form id="selectPerformer">
+        <button type="submit"> select </button> <br>
+    </form>
+    <div id="selectPerformerResultMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->
 

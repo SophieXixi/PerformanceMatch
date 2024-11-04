@@ -62,6 +62,32 @@ async function fetchAndDisplayUsers() {
     });
 }
 
+// Fetches data from the performer table and displays it.
+async function fetchAndDisplayPerformers() {
+    const tableElement = document.getElementById('performer');
+    const tableBody = tableElement.querySelector('tbody');
+
+    const response = await fetch('/performer', {
+        method: 'GET'
+    });
+
+    const responseData = await response.json();
+    const performerContent = responseData.data;
+
+    // Always clear old, already fetched data before new fetching process.
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    performerContent.forEach(user => {
+        const row = tableBody.insertRow();
+        user.forEach((field, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = field;
+        });
+    });
+}
+
 // This function resets or initializes the demotable.
 async function resetDemotable() {
     const response = await fetch("/initiate-demotable", {
@@ -77,6 +103,23 @@ async function resetDemotable() {
         alert("Error initiating table!");
     }
 }
+
+// This function resets or initializes the performer.
+async function resetPerformer() {
+    const response = await fetch("/initiate-performer", {
+        method: 'POST'
+    });
+    const responseData = await response.json();
+
+    if (responseData.success) {
+        const messageElement = document.getElementById('resetPerformerResultMsg');
+        messageElement.textContent = "performer table initiated successfully!";
+        fetchPerformerTableData();
+    } else {
+        alert("Error initiating performer table!");
+    }
+}
+
 
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
@@ -104,6 +147,73 @@ async function insertDemotable(event) {
         fetchTableData();
     } else {
         messageElement.textContent = "Error inserting data!";
+    }
+}
+
+// Inserts new records into the performer table.
+async function insertPerformer(event) {
+    event.preventDefault();
+
+    const idValue = document.getElementById('insertPerformerId').value;
+    const nameValue = document.getElementById('insertPerformerName').value;
+    const debutYearValue = document.getElementById('insertDebutYear').value;
+    const numOfFansValue = document.getElementById('insertNumOfFans').value;
+    const groupIdValue = document.getElementById('insertGroupId').value;
+
+    const response = await fetch('/insert-performer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: idValue,
+            name: nameValue,
+            debutYear: debutYearValue,
+            numOfFans: numOfFansValue,
+            groupId: groupIdValue
+        })
+    });
+
+    const responseData = await response.json();
+    const messageElement = document.getElementById('insertPerformerResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "Data inserted successfully!";
+        fetchPerformerTableDataData();
+    } else {
+        // TODO: handle invalid insert (e.g., group does not exist)
+        messageElement.textContent = "Error inserting data!";
+    }
+}
+
+
+// Selects from performer table based on conditions.
+async function selectPerformer(event) {
+    event.preventDefault();
+
+    const response = await fetch('/select-performer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+//            id: idValue,
+//            name: nameValue,
+//            debutYear: debutYearValue,
+//            numOfFans: numOfFansValue,
+//            groupId: groupIdValue
+        })
+    });
+
+    const responseData = await response.json();
+    const messageElement = document.getElementById('selectPerformerResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "Data selected successfully!";
+        fetchTableData();
+    } else {
+        // TODO: handle invalid selection
+        messageElement.textContent = "Error selecting data!";
     }
 }
 
@@ -161,8 +271,12 @@ async function countDemotable() {
 window.onload = function() {
     checkDbConnection();
     fetchTableData();
+    fetchPerformerTableData();
     document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
+    document.getElementById("resetPerformer").addEventListener("click", resetPerformer);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
+    document.getElementById("insertPerformer").addEventListener("submit", insertPerformer);
+    document.getElementById("selectPerformer").addEventListener("submit", selectPerformer);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
 };
@@ -171,4 +285,10 @@ window.onload = function() {
 // You can invoke this after any table-modifying operation to keep consistency.
 function fetchTableData() {
     fetchAndDisplayUsers();
+}
+
+// General function to refresh the displayed table data.
+// You can invoke this after any table-modifying operation to keep consistency.
+function fetchPerformerTableData() {
+    fetchAndDisplayPerformers();
 }

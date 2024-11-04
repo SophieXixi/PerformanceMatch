@@ -20,6 +20,11 @@ router.get('/demotable', async (req, res) => {
     res.json({data: tableContent});
 });
 
+router.get('/performer', async (req, res) => {
+    const tableContent = await appService.fetchPerformerFromDb();
+    res.json({data: tableContent});
+});
+
 router.post("/initiate-demotable", async (req, res) => {
     const initiateResult = await appService.initiateDemotable();
     if (initiateResult) {
@@ -29,9 +34,41 @@ router.post("/initiate-demotable", async (req, res) => {
     }
 });
 
+router.post("/initiate-performer", async (req, res) => {
+    const initiateResult = await appService.initiatePerformer();
+    if (initiateResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
+
+
 router.post("/insert-demotable", async (req, res) => {
     const { id, name } = req.body;
     const insertResult = await appService.insertDemotable(id, name);
+    if (insertResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
+router.post("/insert-performer", async (req, res) => {
+    const { id, name, debutYear, numOfFans, groupId} = req.body;
+    const insertResult = await appService.insertPerformer(id, name, debutYear, numOfFans, groupId);
+    if (insertResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
+router.post("/select-performer", async (req, res) => {
+    //const { id, name, debutYear, numOfFans, groupId} = req.body;
+    //const insertResult = await appService.insertPerformer(id, name, debutYear, numOfFans, groupId);
+    const insertResult = await appService.selectPerformer;
     if (insertResult) {
         res.json({ success: true });
     } else {
