@@ -62,31 +62,29 @@ async function fetchAndDisplayUsers() {
     });
 }
 
-// Fetches data from the performer table and displays it.
-async function fetchAndDisplayPerformers() {
-    const tableElement = document.getElementById('performer');
+async function fetchAndDisplayTable(tableId, endpoint) {
+    const tableElement = document.getElementById(tableId);
     const tableBody = tableElement.querySelector('tbody');
 
-    const response = await fetch('/performer', {
+    const response = await fetch(endpoint, {
         method: 'GET'
     });
-
     const responseData = await response.json();
-    const performerContent = responseData.data;
+    const tableContent = responseData.data;
 
-    // Always clear old, already fetched data before new fetching process.
     if (tableBody) {
         tableBody.innerHTML = '';
     }
 
-    performerContent.forEach(user => {
+    tableContent.forEach(rowData => {
         const row = tableBody.insertRow();
-        user.forEach((field, index) => {
+        rowData.forEach((field, index) => {
             const cell = row.insertCell(index);
             cell.textContent = field;
         });
     });
 }
+
 
 // This function resets or initializes the demotable.
 async function resetDemotable() {
@@ -104,19 +102,20 @@ async function resetDemotable() {
     }
 }
 
+
 // This function resets or initializes the performer.
-async function resetPerformer() {
-    const response = await fetch("/initiate-performer", {
+async function resetAll() {
+    const response = await fetch("/initiate-all", {
         method: 'POST'
     });
     const responseData = await response.json();
 
     if (responseData.success) {
-        const messageElement = document.getElementById('resetPerformerResultMsg');
-        messageElement.textContent = "performer table initiated successfully!";
+        const messageElement = document.getElementById('resetAllResultMsg');
+        messageElement.textContent = "all tables initiated successfully!";
         fetchPerformerTableData();
     } else {
-        alert("Error initiating performer table!");
+        alert("Error initiating all table!");
     }
 }
 
@@ -271,9 +270,11 @@ async function countDemotable() {
 window.onload = function() {
     checkDbConnection();
     fetchTableData();
-    fetchPerformerTableData();
+//    fetchPerformerTableData();
+
+    fetchAllTableData();
     document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
-    document.getElementById("resetPerformer").addEventListener("click", resetPerformer);
+    document.getElementById("resetAll").addEventListener("click", resetAll);
     document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
     document.getElementById("insertPerformer").addEventListener("submit", insertPerformer);
     document.getElementById("selectPerformer").addEventListener("submit", selectPerformer);
@@ -281,14 +282,18 @@ window.onload = function() {
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
 };
 
-// General function to refresh the displayed table data. 
+// General function to refresh the displayed table data.
 // You can invoke this after any table-modifying operation to keep consistency.
 function fetchTableData() {
     fetchAndDisplayUsers();
 }
 
-// General function to refresh the displayed table data.
-// You can invoke this after any table-modifying operation to keep consistency.
-function fetchPerformerTableData() {
-    fetchAndDisplayPerformers();
+
+function fetchAllTableData() {
+//    fetchAndDisplayTable('demotable', '/demotable');
+    fetchAndDisplayTable('performer_table', '/performer');
+    fetchAndDisplayTable('performer_group_table', '/performer_group');
+    fetchAndDisplayTable('match_date_table', '/match_date');
+    fetchAndDisplayTable('song_table', '/song');
+    fetchAndDisplayTable('artist_table', '/artist');
 }

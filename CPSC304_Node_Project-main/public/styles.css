@@ -9,6 +9,17 @@ body {
     color: #313131;
 }
 
+.primary-key {
+    color: red;
+    text-decoration: underline;
+}
+
+.foreign-key {
+    color: blue;
+    font-weight: bold;
+}
+
+
 hr {
     border-top: 2px solid rgb(44, 51, 62);
     margin: auto;

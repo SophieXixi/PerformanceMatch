@@ -20,8 +20,9 @@ router.get('/demotable', async (req, res) => {
     res.json({data: tableContent});
 });
 
-router.get('/performer', async (req, res) => {
-    const tableContent = await appService.fetchPerformerFromDb();
+router.get('/:tableName', async (req, res) => {
+    const { tableName } = req.params;
+    const tableContent = await appService.fetchTableFromDb(tableName);
     res.json({data: tableContent});
 });
 
@@ -34,15 +35,14 @@ router.post("/initiate-demotable", async (req, res) => {
     }
 });
 
-router.post("/initiate-performer", async (req, res) => {
-    const initiateResult = await appService.initiatePerformer();
+router.post("/initiate-all", async (req, res) => {
+    const initiateResult = await appService.initiateAll();
     if (initiateResult) {
         res.json({ success: true });
     } else {
         res.status(500).json({ success: false });
     }
 });
-
 
 
 router.post("/insert-demotable", async (req, res) => {

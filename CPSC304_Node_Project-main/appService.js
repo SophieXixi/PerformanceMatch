@@ -85,9 +85,11 @@ async function fetchDemotableFromDb() {
     });
 }
 
-async function fetchPerformerFromDb() {
+
+async function fetchTableFromDb(tableName) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT * FROM PERFORMER');
+        const result = await connection.execute(`SELECT * FROM ${tableName}`);
+        // const result = await connection.execute('SELECT * FROM artist');
         return result.rows;
     }).catch(() => {
         return [];
@@ -114,32 +116,67 @@ async function initiateDemotable() {
     });
 }
 
-async function initiatePerformer() {
+// Initiate all tables from a .sql file
+const fs = require('fs').promises;
+const path = require('path');
+
+async function initiateAll() {
     return await withOracleDB(async (connection) => {
         try {
-            await connection.execute(`DROP TABLE PERFORMER`);
-        } catch(err) {
-            console.log('Table might not exist, proceeding to create...');
+            await connection.execute(`DROP TABLE Performer`);
+        } catch (err) {
+            console.log('Table Performer might not exist, proceeding to next...');
         }
 
-        const result = await connection.execute(`
-            CREATE TABLE PERFORMER (
-                performerID INTEGER,
-                performer_name VARCHAR(20) NOT NULL,
-                debut_year INTEGER,
-                num_fans INTEGER,
-                groupID INTEGER NOT NULL,
-                PRIMARY KEY (performerID),
-                FOREIGN KEY (groupID) REFERENCES Group(groupID)
-                    ON DELETE SET DEFAULT
-                    ON UPDATE CASCADE
-            )
-        `);
-        return true;
-    }).catch(() => {
+        try {
+            await connection.execute(`DROP TABLE Performer_Group`);
+        } catch (err) {
+            console.log('Table Performer_Group might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Song`);
+        } catch (err) {
+            console.log('Table Song might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Match_Date`);
+        } catch (err) {
+            console.log('Table Match_Date might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Artist`);
+        } catch (err) {
+            console.log('Table Artist might not exist, proceeding to next...');
+        }
+        try {
+            const sqlFilePath = path.join(__dirname, 'init_all.sql');
+            const sql = await fs.readFile(sqlFilePath, 'utf8');
+            const statements = sql.split(';');
+
+            for (let statement of statements) {
+                if (statement.trim()) {
+                    await connection.execute(statement.trim());
+                }
+            }
+
+            await connection.commit();
+            console.log('Successfully initialized all tables and data.');
+
+            return true;
+        } catch (err) {
+            console.log('Failed to initiate all tables', err);
+        }
+
+    }).catch((err) => {
+        console.log('Error:', err);
         return false;
     });
 }
+
+
 
 async function insertDemotable(id, name) {
     return await withOracleDB(async (connection) => {
@@ -158,7 +195,7 @@ async function insertDemotable(id, name) {
 async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
-            `INSERT INTO PERFORMER VALUES (:id, :name, :debutYear, :numOfFans, :groupId)`,
+            `INSERT INTO Performer VALUES (:id, :name, :debutYear, :numOfFans, :groupId)`,
             [id, name, debutYear, numOfFans, groupId],
             { autoCommit: true }
         );
@@ -173,7 +210,7 @@ async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
 async function selectPerformer() {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
-            'SELECT * FROM PERFORMER WHERE ',
+            'SELECT * FROM Performer WHERE ',
             { autoCommit: true }
         );
 
@@ -209,9 +246,9 @@ async function countDemotable() {
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
-    fetchPerformerFromDb,
+    fetchTableFromDb,
     initiateDemotable,
-    initiatePerformer,
+    initiateAll,
     insertDemotable,
     insertPerformer,
     selectPerformer,
