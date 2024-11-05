@@ -85,6 +85,17 @@ async function fetchDemotableFromDb() {
     });
 }
 
+
+async function fetchTableFromDb(tableName) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(`SELECT * FROM ${tableName}`);
+        // const result = await connection.execute('SELECT * FROM artist');
+        return result.rows;
+    }).catch(() => {
+        return [];
+    });
+}
+
 async function initiateDemotable() {
     return await withOracleDB(async (connection) => {
         try {
@@ -105,11 +116,101 @@ async function initiateDemotable() {
     });
 }
 
+// Initiate all tables from a .sql file
+const fs = require('fs').promises;
+const path = require('path');
+
+async function initiateAll() {
+    return await withOracleDB(async (connection) => {
+        try {
+            await connection.execute(`DROP TABLE Performer`);
+        } catch (err) {
+            console.log('Table Performer might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Performer_Group`);
+        } catch (err) {
+            console.log('Table Performer_Group might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Song`);
+        } catch (err) {
+            console.log('Table Song might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Match_Date`);
+        } catch (err) {
+            console.log('Table Match_Date might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Artist`);
+        } catch (err) {
+            console.log('Table Artist might not exist, proceeding to next...');
+        }
+        try {
+            const sqlFilePath = path.join(__dirname, 'init_all.sql');
+            const sql = await fs.readFile(sqlFilePath, 'utf8');
+            const statements = sql.split(';');
+
+            for (let statement of statements) {
+                if (statement.trim()) {
+                    await connection.execute(statement.trim());
+                }
+            }
+
+            await connection.commit();
+            console.log('Successfully initialized all tables and data.');
+
+            return true;
+        } catch (err) {
+            console.log('Failed to initiate all tables', err);
+        }
+
+    }).catch((err) => {
+        console.log('Error:', err);
+        return false;
+    });
+}
+
+
+
 async function insertDemotable(id, name) {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
             `INSERT INTO DEMOTABLE (id, name) VALUES (:id, :name)`,
             [id, name],
+            { autoCommit: true }
+        );
+
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+        return false;
+    });
+}
+
+async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `INSERT INTO Performer VALUES (:id, :name, :debutYear, :numOfFans, :groupId)`,
+            [id, name, debutYear, numOfFans, groupId],
+            { autoCommit: true }
+        );
+
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+        return false;
+    });
+}
+
+//TODO
+async function selectPerformer() {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            'SELECT * FROM Performer WHERE ',
             { autoCommit: true }
         );
 
@@ -145,8 +246,12 @@ async function countDemotable() {
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
-    initiateDemotable, 
-    insertDemotable, 
+    fetchTableFromDb,
+    initiateDemotable,
+    initiateAll,
+    insertDemotable,
+    insertPerformer,
+    selectPerformer,
     updateNameDemotable, 
     countDemotable
 };
