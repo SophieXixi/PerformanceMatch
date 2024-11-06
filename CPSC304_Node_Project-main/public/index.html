@@ -171,13 +171,42 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 
 <h2> Select Performer </h2>
 <form id="selectPerformer">
+    <div id="selection-container" class="selection-container">
+        <div class="condition-container">
+            <select class="attribute-dropdown">
+                <option value="performerID">performerID</option>
+                <option value="performer_name">performer_name</option>
+                <option value="debut_year">debut_year</option>
+                <option value="num_fans">num_fans</option>
+                <option value="groupID">groupID</option>
+            </select>
+            <select class="operator-dropdown">
+                <option value="=">=</option>
+                <option value="!=">!=</option>
+                <option value="<"><</option>
+                <option value=">">></option>
+                <option value="<="><=</option>
+                <option value=">=">>=</option>
+            </select>
+            
+            <input type="text" class="value-input" placeholder="Value">
+
+        </div>
+    </div>
+    <button type="button" onclick="addACondition()">Add A Condition</button>
+    <button type="button" onclick="addAndCondition()">Add AND Condition</button>
+    <button type="button" onclick="addOrCondition()">Add OR Condition</button>
+    <!-- <button type="button" onclick="addCondition()">Add Condition Test</button> -->
+    <br><br>
+
     <button type="submit"> select </button> <br>
 </form>
 <div id="selectPerformerResultMsg"></div>
-
 <br><hr><br> <!-- ========================================================================= -->
 
 <h2>Update Name in DemoTable</h2>
+
+
 <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 <form id="updataNameDemotable">
     Old Name: <input type="text" id="updateOldName" placeholder="Enter Old Name" required> <br><br>

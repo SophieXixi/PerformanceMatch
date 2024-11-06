@@ -58,22 +58,26 @@ router.post("/insert-demotable", async (req, res) => {
 router.post("/insert-performer", async (req, res) => {
     const { id, name, debutYear, numOfFans, groupId} = req.body;
     const insertResult = await appService.insertPerformer(id, name, debutYear, numOfFans, groupId);
-    if (insertResult) {
-        res.json({ success: true });
+    if (insertResult && insertResult.error) {
+        res.status(500).json({ success: false, error: insertResult.error.message });
     } else {
-        res.status(500).json({ success: false });
+        
+        res.json({ success: true, result: insertResult });
     }
 });
 
 router.post("/select-performer", async (req, res) => {
-    //const { id, name, debutYear, numOfFans, groupId} = req.body;
-    //const insertResult = await appService.insertPerformer(id, name, debutYear, numOfFans, groupId);
-    const insertResult = await appService.selectPerformer;
-    if (insertResult) {
-        res.json({ success: true });
+    const {condition} = req.body;
+    console.log("Received condition clause in appController now is :", condition); // Log received condition
+    const selectResult = await appService.selectPerformer(condition);
+
+    if (selectResult && selectResult.error) {
+        res.status(500).json({ success: false, error: selectResult.error.message });
     } else {
-        res.status(500).json({ success: false });
+        
+        res.json({ success: true, result: selectResult });
     }
+
 });
 
 router.post("/update-name-demotable", async (req, res) => {

@@ -201,22 +201,26 @@ async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
         );
 
         return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
-        return false;
+    }).catch((error) => {
+        console.error("InsertPerformer Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
     });
 }
 
 //TODO
-async function selectPerformer() {
+async function selectPerformer(condition) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            'SELECT * FROM Performer WHERE ',
-            { autoCommit: true }
-        );
+        const sqlQuery = `SELECT * FROM Performer WHERE ${condition}`;
+        console.log("Executing SQL Query:", sqlQuery); 
 
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
-        return false;
+        const result = await connection.execute(sqlQuery);
+
+        return result.rows;
+    }).catch((error) => {
+        console.error("SelectPerformer Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
     });
 }
 

@@ -119,6 +119,53 @@ async function resetAll() {
     }
 }
 
+async function addACondition() {
+
+    const container = document.getElementById("selection-container");
+    const newConditionContainer = document.createElement("div");
+    newConditionContainer.classList.add("condition-container");
+    
+    // container.classList.add(".selection-container");
+
+    const newAndOrDropdown = document.createElement("select");
+    newAndOrDropdown.classList.add("andor-dropdown");
+    newAndOrDropdown.innerHTML = `
+        <select class="andor-dropdown">
+        <option value="AND">AND</option>
+        <option value="OR">OR</option>` ;
+
+    const newAttributeDropdown = document.createElement("select");
+    newAttributeDropdown.classList.add("attribute-dropdown");
+    newAttributeDropdown.innerHTML = `
+        <option value="performerID">performerID</option>
+        <option value="performer_name">performer_name</option>
+        <option value="debut_year">debut_year</option>
+        <option value="num_fans">num_fans</option>
+        <option value="groupID">groupID</option>` ;
+
+    const new0peratorDropdown = document.createElement("select");
+    new0peratorDropdown.classList.add("operator-dropdown");
+    new0peratorDropdown.innerHTML = `<option value="=">=</option>
+         <option value="!=">!=</option>
+         <option value="<"><</option>
+         <option value=">">></option>
+         <option value="<="><=</option>
+         <option value=">=">>=</option>`;
+
+    const newValueInput = document.createElement("input");
+    // newValueInput.innerHTML = `<input type="text" class="value-input" placeholder="Value">`;
+    newValueInput.type = "text";
+    newValueInput.classList.add("value-input");
+    newValueInput.placeholder = "Value";
+
+    // const newConditionContainer = document.createElement("div");
+    newConditionContainer.appendChild(newAndOrDropdown);
+    newConditionContainer.appendChild(newAttributeDropdown);
+    newConditionContainer.appendChild(new0peratorDropdown);
+    newConditionContainer.appendChild(newValueInput);
+    container.appendChild(newConditionContainer);
+}
+
 
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
@@ -178,29 +225,65 @@ async function insertPerformer(event) {
 
     if (responseData.success) {
         messageElement.textContent = "Data inserted successfully!";
-        fetchPerformerTableDataData();
+        // fetchPerformerTableDataData();
+        fetchTableData;
     } else {
-        // TODO: handle invalid insert (e.g., group does not exist)
-        messageElement.textContent = "Error inserting data!";
+        // messageElement.textContent = "Error inserting data!";
+        const errorMessage = responseData.error ? responseData.error : "Error inserting data!";
+        messageElement.textContent = errorMessage;
     }
 }
 
 
 // Selects from performer table based on conditions.
 async function selectPerformer(event) {
-    event.preventDefault();
+    // console.log("Function `selectPerformer` triggered."); // Log function start
 
+
+    event.preventDefault();
+    console.log(document.querySelectorAll('.condition-container'));
+    const conditionClause = [];
+    // use querySelectorAll instead of getElementById to select all
+    // const allSelectionContainer = document.querySelectorAll('.selection-container').value;
+    const allSelectionContainer = document.querySelectorAll('.condition-container');
+    console.log("Number of `.condition-container` elements found:", allSelectionContainer.length);
+
+    if (allSelectionContainer.length === 0) {
+        console.error("No elements with class 'condition-container' found.");
+        return;
+    }
+
+    allSelectionContainer.forEach((selectionContainer, index) => {
+        // console.log(index);
+        // console.log(selectionContainer);
+        // console.log("=================");
+        if (index > 0) {
+            const andorValue = selectionContainer.querySelector('.andor-dropdown')?.value || "";
+            conditionClause.push(andorValue);    
+        }
+        
+
+        const attValue = selectionContainer.querySelector('.attribute-dropdown').value;
+        const opValue = selectionContainer.querySelector('.operator-dropdown').value;
+        const inputValue = selectionContainer.querySelector('.value-input').value;
+
+        const formattedInputValue = isNaN(inputValue) ? `'${inputValue}'` : inputValue;
+
+        const conditionString = `${attValue} ${opValue} ${formattedInputValue}`;
+
+        conditionClause.push(conditionString);
+    
+    })
+
+    const fullCondition = conditionClause.join(" ");
+    // console.log("Final SQL Condition Clause:", fullCondition);
     const response = await fetch('/select-performer', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-//            id: idValue,
-//            name: nameValue,
-//            debutYear: debutYearValue,
-//            numOfFans: numOfFansValue,
-//            groupId: groupIdValue
+            condition: fullCondition
         })
     });
 
@@ -208,13 +291,32 @@ async function selectPerformer(event) {
     const messageElement = document.getElementById('selectPerformerResultMsg');
 
     if (responseData.success) {
-        messageElement.textContent = "Data selected successfully!";
-        fetchTableData();
+        messageElement.textContent = "The select result is:";
+
+        const resultContainer = document.createElement('div');
+
+        if (responseData.result.length === 0){
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            responseData.result.forEach(rowData => {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = JSON.stringify(rowData);
+            resultContainer.appendChild(resultRow);
+            });
+        }
+
+        messageElement.appendChild(resultContainer);
+
+        // fetchTableData();
     } else {
-        // TODO: handle invalid selection
-        messageElement.textContent = "Error selecting data!";
+        const errorMessage = responseData.error ? responseData.error : "Error selecting data!";
+        messageElement.textContent = errorMessage;
     }
 }
+
+
 
 // Updates names in the demotable.
 async function updateNameDemotable(event) {
