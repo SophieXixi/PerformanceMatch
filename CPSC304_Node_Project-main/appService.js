@@ -201,22 +201,26 @@ async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
         );
 
         return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
-        return false;
+    }).catch((error) => {
+        console.error("InsertPerformer Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
     });
 }
 
 //TODO
-async function selectPerformer() {
+async function selectPerformer(condition) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            'SELECT * FROM Performer WHERE ',
-            { autoCommit: true }
-        );
+        const sqlQuery = `SELECT * FROM Performer WHERE ${condition}`;
+        console.log("Executing SQL Query:", sqlQuery); 
 
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
-        return false;
+        const result = await connection.execute(sqlQuery);
+
+        return result.rows;
+    }).catch((error) => {
+        console.error("SelectPerformer Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
     });
 }
 
@@ -235,6 +239,7 @@ async function updateNameDemotable(oldName, newName) {
 }
 
 async function countDemotable() {
+    // return 4;
     return await withOracleDB(async (connection) => {
         const result = await connection.execute('SELECT Count(*) FROM DEMOTABLE');
         return result.rows[0][0];
@@ -242,6 +247,24 @@ async function countDemotable() {
         return -1;
     });
 }
+
+
+async function aggregationGroupby() {
+    return await withOracleDB(async (connection) => {
+        const sqlQuery = `SELECT groupID, MIN(num_fans) AS min_fan FROM Performer GROUP BY groupID`;
+        console.log("Executing SQL Query:", sqlQuery); 
+
+        const result = await connection.execute(sqlQuery);
+
+        return result.rows;
+    }).catch((error) => {
+        console.error("aggregationGroupby Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
+    });
+}
+
+
 
 module.exports = {
     testOracleConnection,
@@ -253,5 +276,6 @@ module.exports = {
     insertPerformer,
     selectPerformer,
     updateNameDemotable, 
-    countDemotable
+    countDemotable,
+    aggregationGroupby
 };

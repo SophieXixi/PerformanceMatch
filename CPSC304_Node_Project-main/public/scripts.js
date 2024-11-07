@@ -119,6 +119,53 @@ async function resetAll() {
     }
 }
 
+async function addACondition() {
+
+    const container = document.getElementById("selection-container");
+    const newConditionContainer = document.createElement("div");
+    newConditionContainer.classList.add("condition-container");
+    
+    // container.classList.add(".selection-container");
+
+    const newAndOrDropdown = document.createElement("select");
+    newAndOrDropdown.classList.add("andor-dropdown");
+    newAndOrDropdown.innerHTML = `
+        <select class="andor-dropdown">
+        <option value="AND">AND</option>
+        <option value="OR">OR</option>` ;
+
+    const newAttributeDropdown = document.createElement("select");
+    newAttributeDropdown.classList.add("attribute-dropdown");
+    newAttributeDropdown.innerHTML = `
+        <option value="performerID">performerID</option>
+        <option value="performer_name">performer_name</option>
+        <option value="debut_year">debut_year</option>
+        <option value="num_fans">num_fans</option>
+        <option value="groupID">groupID</option>` ;
+
+    const new0peratorDropdown = document.createElement("select");
+    new0peratorDropdown.classList.add("operator-dropdown");
+    new0peratorDropdown.innerHTML = `<option value="=">=</option>
+         <option value="!=">!=</option>
+         <option value="<"><</option>
+         <option value=">">></option>
+         <option value="<="><=</option>
+         <option value=">=">>=</option>`;
+
+    const newValueInput = document.createElement("input");
+    // newValueInput.innerHTML = `<input type="text" class="value-input" placeholder="Value">`;
+    newValueInput.type = "text";
+    newValueInput.classList.add("value-input");
+    newValueInput.placeholder = "Value";
+
+    // const newConditionContainer = document.createElement("div");
+    newConditionContainer.appendChild(newAndOrDropdown);
+    newConditionContainer.appendChild(newAttributeDropdown);
+    newConditionContainer.appendChild(new0peratorDropdown);
+    newConditionContainer.appendChild(newValueInput);
+    container.appendChild(newConditionContainer);
+}
+
 
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
@@ -178,29 +225,65 @@ async function insertPerformer(event) {
 
     if (responseData.success) {
         messageElement.textContent = "Data inserted successfully!";
-        fetchPerformerTableDataData();
+        // fetchPerformerTableDataData();
+        fetchTableData;
     } else {
-        // TODO: handle invalid insert (e.g., group does not exist)
-        messageElement.textContent = "Error inserting data!";
+        // messageElement.textContent = "Error inserting data!";
+        const errorMessage = responseData.error ? responseData.error : "Error inserting data!";
+        messageElement.textContent = errorMessage;
     }
 }
 
 
 // Selects from performer table based on conditions.
 async function selectPerformer(event) {
-    event.preventDefault();
+    // console.log("Function `selectPerformer` triggered."); // Log function start
 
+
+    event.preventDefault();
+    console.log(document.querySelectorAll('.condition-container'));
+    const conditionClause = [];
+    // use querySelectorAll instead of getElementById to select all
+    // const allSelectionContainer = document.querySelectorAll('.selection-container').value;
+    const allSelectionContainer = document.querySelectorAll('.condition-container');
+    console.log("Number of `.condition-container` elements found:", allSelectionContainer.length);
+
+    if (allSelectionContainer.length === 0) {
+        console.error("No elements with class 'condition-container' found.");
+        return;
+    }
+
+    allSelectionContainer.forEach((selectionContainer, index) => {
+        // console.log(index);
+        // console.log(selectionContainer);
+        // console.log("=================");
+        if (index > 0) {
+            const andorValue = selectionContainer.querySelector('.andor-dropdown')?.value || "";
+            conditionClause.push(andorValue);    
+        }
+        
+
+        const attValue = selectionContainer.querySelector('.attribute-dropdown').value;
+        const opValue = selectionContainer.querySelector('.operator-dropdown').value;
+        const inputValue = selectionContainer.querySelector('.value-input').value;
+
+        const formattedInputValue = isNaN(inputValue) ? `'${inputValue}'` : inputValue;
+
+        const conditionString = `${attValue} ${opValue} ${formattedInputValue}`;
+
+        conditionClause.push(conditionString);
+    
+    })
+
+    const fullCondition = conditionClause.join(" ");
+    // console.log("Final SQL Condition Clause:", fullCondition);
     const response = await fetch('/select-performer', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-//            id: idValue,
-//            name: nameValue,
-//            debutYear: debutYearValue,
-//            numOfFans: numOfFansValue,
-//            groupId: groupIdValue
+            condition: fullCondition
         })
     });
 
@@ -208,13 +291,32 @@ async function selectPerformer(event) {
     const messageElement = document.getElementById('selectPerformerResultMsg');
 
     if (responseData.success) {
-        messageElement.textContent = "Data selected successfully!";
-        fetchTableData();
+        messageElement.textContent = "The select result is:";
+
+        const resultContainer = document.createElement('div');
+
+        if (responseData.result.length === 0){
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            responseData.result.forEach(rowData => {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = JSON.stringify(rowData);
+            resultContainer.appendChild(resultRow);
+            });
+        }
+
+        messageElement.appendChild(resultContainer);
+
+        // fetchTableData();
     } else {
-        // TODO: handle invalid selection
-        messageElement.textContent = "Error selecting data!";
+        const errorMessage = responseData.error ? responseData.error : "Error selecting data!";
+        messageElement.textContent = errorMessage;
     }
 }
+
+
 
 // Updates names in the demotable.
 async function updateNameDemotable(event) {
@@ -255,6 +357,8 @@ async function countDemotable() {
     const responseData = await response.json();
     const messageElement = document.getElementById('countResultMsg');
 
+    console.log("responseData for countDemotable is: ");
+    console.log(responseData);
     if (responseData.success) {
         const tupleCount = responseData.count;
         messageElement.textContent = `The number of tuples in demotable: ${tupleCount}`;
@@ -263,6 +367,84 @@ async function countDemotable() {
     }
 }
 
+async function aggregationGroupby(event) {
+    event.preventDefault();
+    console.log("aggregationGroupby start");
+    const response = await fetch("/aggregation-groupby", {
+        method: 'GET'
+    });
+    console.log("response is :");
+    console.log(response);  
+    console.log(response.success);  
+    const responseData = await response.json();
+    const messageElement = document.getElementById('aggregationGroupbyResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "The result is:";
+
+        const resultContainer = document.createElement('div');
+
+        if (responseData.result.length === 0){
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            // Create a table to put the results with headers
+            const resultTable = document.createElement('table');
+            resultTable.setAttribute("border", "1");
+            const headerRow = document.createElement('tr');
+            const groupIDHeader = document.createElement('th');
+            groupIDHeader.textContent = 'Group ID';
+            const minFansHeader = document.createElement('th');
+            minFansHeader.textContent = 'Minimum Fans';
+
+            // put <th> in <tr>
+            headerRow.appendChild(groupIDHeader);
+            headerRow.appendChild(minFansHeader);
+
+            // put <tr> in <table>
+            resultTable.appendChild(headerRow);
+
+            responseData.result.forEach(rowData => {
+                // const resultRow = document.createElement('div');
+                // resultRow.textContent = JSON.stringify(rowData);
+                // resultContainer.appendChild(resultRow);
+                const row = document.createElement('tr');
+            
+                const groupIDCell = document.createElement('td');
+                groupIDCell.textContent = rowData[0];
+                
+                const minFansCell = document.createElement('td');
+                minFansCell.textContent = rowData[1];
+                
+                row.appendChild(groupIDCell);
+                row.appendChild(minFansCell);
+                resultTable.appendChild(row);
+            });
+            resultContainer.appendChild(resultTable);
+        }
+
+        messageElement.appendChild(resultContainer);
+        fetchTableData;
+
+
+
+
+        // console.log("aggregationGroupby success");
+
+        // messageElement.textContent = `The result is: ${responseData.result}`;
+        // fetchPerformerTableDataData();
+        // fetchTableData;
+    } else {
+
+        // // messageElement.textContent = "Error inserting data!";
+        // console.log("aggregationGroupby fail");
+        // console.log("responseData is :");
+        // console.log(responseData);
+        const errorMessage = responseData.error ? responseData.error : "Error aggregationGroupby!";
+        messageElement.textContent = errorMessage;
+    }
+}
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
@@ -280,6 +462,7 @@ window.onload = function() {
     document.getElementById("selectPerformer").addEventListener("submit", selectPerformer);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
+    document.getElementById("aggregationGroupby").addEventListener("click", aggregationGroupby);
 };
 
 // General function to refresh the displayed table data.

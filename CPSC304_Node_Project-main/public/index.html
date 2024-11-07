@@ -157,7 +157,7 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 </form>
 <div id="insertResultMsg"></div>
 
-<h2> Insert Values into Performer Table </h2>
+<h2> 2.1.1 Insert Values into Performer Table </h2>
 <form id="insertPerformer">
 
     ID: <input type="number" id="insertPerformerId" placeholder="Enter ID" required> <br><br>
@@ -169,15 +169,43 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 </form>
 <div id="insertPerformerResultMsg"></div>
 
-<h2> Select Performer </h2>
+<br><hr><br> <!-- ========================================================================= -->
+
+<h2> 2.1.4 Select Performer </h2>
 <form id="selectPerformer">
+    <div id="selection-container" class="selection-container">
+        <div class="condition-container">
+            <select class="attribute-dropdown">
+                <option value="performerID">performerID</option>
+                <option value="performer_name">performer_name</option>
+                <option value="debut_year">debut_year</option>
+                <option value="num_fans">num_fans</option>
+                <option value="groupID">groupID</option>
+            </select>
+            <select class="operator-dropdown">
+                <option value="=">=</option>
+                <option value="!=">!=</option>
+                <option value="<"><</option>
+                <option value=">">></option>
+                <option value="<="><=</option>
+                <option value=">=">>=</option>
+            </select>
+            
+            <input type="text" class="value-input" placeholder="Value">
+
+        </div>
+    </div>
+    <button type="button" onclick="addACondition()">Add A Condition</button>
+    <br><br>
+
     <button type="submit"> select </button> <br>
 </form>
 <div id="selectPerformerResultMsg"></div>
-
 <br><hr><br> <!-- ========================================================================= -->
 
 <h2>Update Name in DemoTable</h2>
+
+
 <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
 <form id="updataNameDemotable">
     Old Name: <input type="text" id="updateOldName" placeholder="Enter Old Name" required> <br><br>
@@ -194,6 +222,16 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 <button id="countDemotable"> count </button> <br><br>
 <!-- A placeholder to display the count result. -->
 <div id="countResultMsg"></div> <br>
+
+<br><hr><br> <!-- ========================================================================= -->
+
+<h2>2.1.7 Aggregation with GROUP BY</h2>
+<p>In every group, let's find out the min number of fans of performers in that group.</p>
+<button id="aggregationGroupby">Show Minimum Number of Fans by Each Group</button> <br><br>
+
+
+<div id="aggregationGroupbyResultMsg"></div> <br>
+
 
 <!-- ===================================================================================== -->
 <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
