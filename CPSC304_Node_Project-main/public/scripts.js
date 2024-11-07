@@ -357,6 +357,8 @@ async function countDemotable() {
     const responseData = await response.json();
     const messageElement = document.getElementById('countResultMsg');
 
+    console.log("responseData for countDemotable is: ");
+    console.log(responseData);
     if (responseData.success) {
         const tupleCount = responseData.count;
         messageElement.textContent = `The number of tuples in demotable: ${tupleCount}`;
@@ -365,6 +367,84 @@ async function countDemotable() {
     }
 }
 
+async function aggregationGroupby(event) {
+    event.preventDefault();
+    console.log("aggregationGroupby start");
+    const response = await fetch("/aggregation-groupby", {
+        method: 'GET'
+    });
+    console.log("response is :");
+    console.log(response);  
+    console.log(response.success);  
+    const responseData = await response.json();
+    const messageElement = document.getElementById('aggregationGroupbyResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "The result is:";
+
+        const resultContainer = document.createElement('div');
+
+        if (responseData.result.length === 0){
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            // Create a table to put the results with headers
+            const resultTable = document.createElement('table');
+            resultTable.setAttribute("border", "1");
+            const headerRow = document.createElement('tr');
+            const groupIDHeader = document.createElement('th');
+            groupIDHeader.textContent = 'Group ID';
+            const minFansHeader = document.createElement('th');
+            minFansHeader.textContent = 'Minimum Fans';
+
+            // put <th> in <tr>
+            headerRow.appendChild(groupIDHeader);
+            headerRow.appendChild(minFansHeader);
+
+            // put <tr> in <table>
+            resultTable.appendChild(headerRow);
+
+            responseData.result.forEach(rowData => {
+                // const resultRow = document.createElement('div');
+                // resultRow.textContent = JSON.stringify(rowData);
+                // resultContainer.appendChild(resultRow);
+                const row = document.createElement('tr');
+            
+                const groupIDCell = document.createElement('td');
+                groupIDCell.textContent = rowData[0];
+                
+                const minFansCell = document.createElement('td');
+                minFansCell.textContent = rowData[1];
+                
+                row.appendChild(groupIDCell);
+                row.appendChild(minFansCell);
+                resultTable.appendChild(row);
+            });
+            resultContainer.appendChild(resultTable);
+        }
+
+        messageElement.appendChild(resultContainer);
+        fetchTableData;
+
+
+
+
+        // console.log("aggregationGroupby success");
+
+        // messageElement.textContent = `The result is: ${responseData.result}`;
+        // fetchPerformerTableDataData();
+        // fetchTableData;
+    } else {
+
+        // // messageElement.textContent = "Error inserting data!";
+        // console.log("aggregationGroupby fail");
+        // console.log("responseData is :");
+        // console.log(responseData);
+        const errorMessage = responseData.error ? responseData.error : "Error aggregationGroupby!";
+        messageElement.textContent = errorMessage;
+    }
+}
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
@@ -382,6 +462,7 @@ window.onload = function() {
     document.getElementById("selectPerformer").addEventListener("submit", selectPerformer);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
+    document.getElementById("aggregationGroupby").addEventListener("click", aggregationGroupby);
 };
 
 // General function to refresh the displayed table data.

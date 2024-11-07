@@ -157,7 +157,7 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 </form>
 <div id="insertResultMsg"></div>
 
-<h2> Insert Values into Performer Table </h2>
+<h2> 2.1.1 Insert Values into Performer Table </h2>
 <form id="insertPerformer">
 
     ID: <input type="number" id="insertPerformerId" placeholder="Enter ID" required> <br><br>
@@ -169,7 +169,9 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 </form>
 <div id="insertPerformerResultMsg"></div>
 
-<h2> Select Performer </h2>
+<br><hr><br> <!-- ========================================================================= -->
+
+<h2> 2.1.4 Select Performer </h2>
 <form id="selectPerformer">
     <div id="selection-container" class="selection-container">
         <div class="condition-container">
@@ -194,9 +196,6 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
         </div>
     </div>
     <button type="button" onclick="addACondition()">Add A Condition</button>
-    <button type="button" onclick="addAndCondition()">Add AND Condition</button>
-    <button type="button" onclick="addOrCondition()">Add OR Condition</button>
-    <!-- <button type="button" onclick="addCondition()">Add Condition Test</button> -->
     <br><br>
 
     <button type="submit"> select </button> <br>
@@ -223,6 +222,16 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 <button id="countDemotable"> count </button> <br><br>
 <!-- A placeholder to display the count result. -->
 <div id="countResultMsg"></div> <br>
+
+<br><hr><br> <!-- ========================================================================= -->
+
+<h2>2.1.7 Aggregation with GROUP BY</h2>
+<p>In every group, let's find out the min number of fans of performers in that group.</p>
+<button id="aggregationGroupby">Show Minimum Number of Fans by Each Group</button> <br><br>
+
+
+<div id="aggregationGroupbyResultMsg"></div> <br>
+
 
 <!-- ===================================================================================== -->
 <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
