@@ -208,6 +208,21 @@ async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
     });
 }
 
+async function deletePerformer(condition) {
+    return await withOracleDB(async (connection) => {
+        const sqlQuery = `DELETE FROM Performer WHERE ${condition}`;
+        console.log("Executing SQL Query:", sqlQuery); 
+
+        const result = await connection.execute(sqlQuery);
+        await connection.commit();
+        return result;
+    }).catch((error) => {
+        console.error("deletePerformer Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
+    });
+}
+
 //TODO
 async function selectPerformer(condition) {
     return await withOracleDB(async (connection) => {
@@ -222,6 +237,36 @@ async function selectPerformer(condition) {
         // return error for the router to handle and show in front end
         return {error};
     });
+}
+
+async function projectPerformer(columns) {
+    return await withOracleDB(async (connection) => {
+        const sqlQuery = `SELECT ${columns} FROM Performer`;
+        console.log("Executing SQL Query:", sqlQuery); 
+
+        const result = await connection.execute(sqlQuery);
+
+        return result.rows;
+    }).catch((error) => {
+        console.error("projectPerformer Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
+    });
+}
+
+async function nestedAggregation(group_by, generalSign, havingSign, havingConstraint, select) {
+    return await withOracleDB(async (connection) => {
+        const subQuery = `SELECT ${generalSign}(num_fans) FROM Performer`;
+        const sqlQuery = `SELECT P.${group_by}, ${select} FROM Performer P GROUP BY P.${group_by} HAVING ${havingSign}(P.num_fans) ${havingConstraint} (${subQuery})`;
+        console.log("subquery: ", subQuery);
+        console.log("SQL Query: ", sqlQuery);
+
+        const result = await connection.execute(sqlQuery);
+        return result.rows;
+    }).catch((error) => {
+        console.error("nested aggregation error: ", error);
+        return {error};
+    })
 }
 
 async function updateNameDemotable(oldName, newName) {
@@ -274,7 +319,10 @@ module.exports = {
     initiateAll,
     insertDemotable,
     insertPerformer,
+    deletePerformer,
     selectPerformer,
+    projectPerformer,
+    nestedAggregation,
     updateNameDemotable, 
     countDemotable,
     aggregationGroupby
