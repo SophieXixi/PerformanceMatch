@@ -76,6 +76,20 @@ router.post("/insert-performer", async (req, res) => {
     }
 });
 
+router.post("/delete-performer", async (req, res) => {
+    console.log("in app controller");
+    console.log(req);
+    const {condition} = req.body;
+    console.log(condition);
+    const deleteResult = await appService.deletePerformer(condition);
+    console.log(deleteResult);
+    if (deleteResult && deleteResult.error) {
+        res.status(500).json({ success: false, error: deleteResult.error.message });
+    } else {
+        res.json({ success: true, result: deleteResult });
+    }
+});
+
 router.post("/select-performer", async (req, res) => {
     const {condition} = req.body;
     console.log("Received condition clause in appController now is :", condition); // Log received condition
@@ -88,6 +102,34 @@ router.post("/select-performer", async (req, res) => {
         res.json({ success: true, result: selectResult });
     }
 
+});
+
+router.post("/project-performer", async (req, res) => {
+    console.log("in app controller");
+    console.log(req);
+    const {columns} = req.body;
+    console.log(columns);
+    const projectResult = await appService.projectPerformer(columns);
+    console.log(projectResult);
+    if (projectResult && projectResult.error) {
+        res.status(500).json({ success: false, error: projectResult.error.message });
+    } else {
+        res.json({ success: true, result: projectResult });
+    }
+});
+
+router.post("/nestedAggregation-performer", async (req, res) => {
+    console.log("in app controller");
+    console.log(req);
+    const {group_by, generalSign, havingSign, havingConstraint, select} = req.body;
+    console.log(group_by, generalSign, havingSign, havingConstraint, select);
+    const nestedAggregationResult = await appService.nestedAggregation(group_by, generalSign, havingSign, havingConstraint, select);
+    console.log(nestedAggregationResult);
+    if (nestedAggregationResult && nestedAggregationResult.error) {
+        res.status(500).json({ success: false, error: nestedAggregationResult.error.message });
+    } else {
+        res.json({ success: true, result: nestedAggregationResult });
+    }
 });
 
 router.post("/update-name-demotable", async (req, res) => {

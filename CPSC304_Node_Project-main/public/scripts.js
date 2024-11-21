@@ -28,38 +28,38 @@ async function checkDbConnection() {
     statusElem.style.display = 'inline';
 
     response.text()
-    .then((text) => {
-        statusElem.textContent = text;
-    })
-    .catch((error) => {
-        statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
-    });
+        .then((text) => {
+            statusElem.textContent = text;
+        })
+        .catch((error) => {
+            statusElem.textContent = 'connection timed out';  // Adjust error handling if required.
+        });
 }
 
 // Fetches data from the demotable and displays it.
 async function fetchAndDisplayUsers() {
-    const tableElement = document.getElementById('demotable');
-    const tableBody = tableElement.querySelector('tbody');
+    // const tableElement = document.getElementById('demotable');
+    // const tableBody = tableElement.querySelector('tbody');
 
-    const response = await fetch('/demotable', {
-        method: 'GET'
-    });
+    // const response = await fetch('/demotable', {
+    //     method: 'GET'
+    // });
 
-    const responseData = await response.json();
-    const demotableContent = responseData.data;
+    // const responseData = await response.json();
+    // const demotableContent = responseData.data;
 
-    // Always clear old, already fetched data before new fetching process.
-    if (tableBody) {
-        tableBody.innerHTML = '';
-    }
+    // // Always clear old, already fetched data before new fetching process.
+    // if (tableBody) {
+    //     tableBody.innerHTML = '';
+    // }
 
-    demotableContent.forEach(user => {
-        const row = tableBody.insertRow();
-        user.forEach((field, index) => {
-            const cell = row.insertCell(index);
-            cell.textContent = field;
-        });
-    });
+    // demotableContent.forEach(user => {
+    //     const row = tableBody.insertRow();
+    //     user.forEach((field, index) => {
+    //         const cell = row.insertCell(index);
+    //         cell.textContent = field;
+    //     });
+    // });
 }
 
 async function fetchAndDisplayTable(tableId, endpoint) {
@@ -85,24 +85,6 @@ async function fetchAndDisplayTable(tableId, endpoint) {
     });
 }
 
-
-// This function resets or initializes the demotable.
-async function resetDemotable() {
-    const response = await fetch("/initiate-demotable", {
-        method: 'POST'
-    });
-    const responseData = await response.json();
-
-    if (responseData.success) {
-        const messageElement = document.getElementById('resetResultMsg');
-        messageElement.textContent = "demotable initiated successfully!";
-        fetchTableData();
-    } else {
-        alert("Error initiating table!");
-    }
-}
-
-
 // This function resets or initializes the performer.
 async function resetAll() {
     const response = await fetch("/initiate-all", {
@@ -124,7 +106,7 @@ async function addACondition() {
     const container = document.getElementById("selection-container");
     const newConditionContainer = document.createElement("div");
     newConditionContainer.classList.add("condition-container");
-    
+
     // container.classList.add(".selection-container");
 
     const newAndOrDropdown = document.createElement("select");
@@ -235,6 +217,70 @@ async function insertPerformer(event) {
 }
 
 
+async function deletePerformer(event) {
+    console.log("in delete performer scripts.js");
+    event.preventDefault();
+    const allconditions = [];
+
+    const performerID = document.getElementById("deletePerformerID").value;
+    const performerName = document.getElementById("deletePerformerName").value;
+    const debutYearConstraint = document.getElementById("debutYearConstraint").value;
+    const debutYear = document.getElementById("deletePerformerDebutYear").value;
+    const fansConstraint = document.getElementById("numberFansConstraint").value;
+    const numberFans = document.getElementById("deletePerformerFans").value;
+    const groupID = document.getElementById("deletePerformerGroup").value;
+    
+    if (performerID) {
+        allconditions.push(`performerID = ${performerID}`);
+    }
+    if (performerName) {
+        allconditions.push(`performer_name = "${performerName}"`);
+    }
+    if (debutYearConstraint != " " && debutYear) {
+        if (debutYearConstraint == "<") {
+            allconditions.push(`debut_year < ${debutYear}`);
+        } else if (debutYearConstraint == "=") {
+            allconditions.push(`debut_year = ${debutYear}`);
+        } else {
+            allconditions.push(`debut_year > ${debutYear}`);
+        }
+    }
+    if (fansConstraint != " " && numberFans) {
+        if (fansConstraint == "<") {
+            allconditions.push(`num_fans < ${numberFans}`);
+        } else if (fansConstraint == "=") {
+            allconditions.push(`num_fans = ${numberFans}`);
+        } else {
+            allconditions.push(`num_fans > ${numberFans}`);
+        }
+    }
+    if (groupID) {
+        allconditions.push(`groupID = ${groupID}`);
+    }
+    console.log(allconditions);
+    fullcondition = allconditions.join(" and ");
+    console.log(fullcondition);
+    const response = await fetch('/delete-performer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            condition: fullcondition
+        })
+    });
+    console.log("after fetch");
+    console.log(response);
+    const responseData = await response.json();
+    console.log(responseData);
+    const messageElement = document.getElementById('deletePerformerResultMsg');
+
+    messageElement.textContent = "TODO!!! on cascade delete";
+
+    const resultContainer = document.createElement('div');
+}
+
+
 // Selects from performer table based on conditions.
 async function selectPerformer(event) {
     // console.log("Function `selectPerformer` triggered."); // Log function start
@@ -259,9 +305,9 @@ async function selectPerformer(event) {
         // console.log("=================");
         if (index > 0) {
             const andorValue = selectionContainer.querySelector('.andor-dropdown')?.value || "";
-            conditionClause.push(andorValue);    
+            conditionClause.push(andorValue);
         }
-        
+
 
         const attValue = selectionContainer.querySelector('.attribute-dropdown').value;
         const opValue = selectionContainer.querySelector('.operator-dropdown').value;
@@ -272,7 +318,7 @@ async function selectPerformer(event) {
         const conditionString = `${attValue} ${opValue} ${formattedInputValue}`;
 
         conditionClause.push(conditionString);
-    
+
     })
 
     const fullCondition = conditionClause.join(" ");
@@ -286,7 +332,7 @@ async function selectPerformer(event) {
             condition: fullCondition
         })
     });
-
+    console.log("await response");
     const responseData = await response.json();
     const messageElement = document.getElementById('selectPerformerResultMsg');
 
@@ -295,15 +341,15 @@ async function selectPerformer(event) {
 
         const resultContainer = document.createElement('div');
 
-        if (responseData.result.length === 0){
+        if (responseData.result.length === 0) {
             const resultRow = document.createElement('div');
             resultRow.textContent = "No Result Found";
             resultContainer.appendChild(resultRow);
         } else {
             responseData.result.forEach(rowData => {
-            const resultRow = document.createElement('div');
-            resultRow.textContent = JSON.stringify(rowData);
-            resultContainer.appendChild(resultRow);
+                const resultRow = document.createElement('div');
+                resultRow.textContent = JSON.stringify(rowData);
+                resultContainer.appendChild(resultRow);
             });
         }
 
@@ -316,55 +362,111 @@ async function selectPerformer(event) {
     }
 }
 
-
-
-// Updates names in the demotable.
-async function updateNameDemotable(event) {
+async function projectPerformer(event) {
+    console.log("in project performer scripts.js");
     event.preventDefault();
+    selectedColumns = [];
 
-    const oldNameValue = document.getElementById('updateOldName').value;
-    const newNameValue = document.getElementById('updateNewName').value;
-
-    const response = await fetch('/update-name-demotable', {
+    const checkboxes = document.querySelectorAll('input[name="performerAttributes"]:checked');
+    checkboxes.forEach((checkbox) => {
+        selectedColumns.push(checkbox.value);
+    });
+    const selected = selectedColumns.join(', ');
+    console.log(selected);
+    const response = await fetch('/project-performer', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            oldName: oldNameValue,
-            newName: newNameValue
+            columns: selected
         })
     });
-
+    console.log("after fetch");
+    console.log(response);
     const responseData = await response.json();
-    const messageElement = document.getElementById('updateNameResultMsg');
+    console.log(responseData);
+    const messageElement = document.getElementById('ProjectionPerformerResultMsg');
 
-    if (responseData.success) {
-        messageElement.textContent = "Name updated successfully!";
-        fetchTableData();
+    messageElement.textContent = "The select result is:";
+
+    const resultContainer = document.createElement('div');
+
+    if (responseData.result.length === 0) {
+        const resultRow = document.createElement('div');
+        resultRow.textContent = "No Result Found";
+        resultContainer.appendChild(resultRow);
     } else {
-        messageElement.textContent = "Error updating name!";
+        responseData.result.forEach(rowData => {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = JSON.stringify(rowData);
+            resultContainer.appendChild(resultRow);
+        });
     }
+
+    messageElement.appendChild(resultContainer);
+
 }
 
-// Counts rows in the demotable.
-// Modify the function accordingly if using different aggregate functions or procedures.
-async function countDemotable() {
-    const response = await fetch("/count-demotable", {
-        method: 'GET'
-    });
+async function nestedAggregationPerformer(event) {
+    console.log("in nested aggregation performer scripts.js");
+    event.preventDefault();
+    selected = [];
 
-    const responseData = await response.json();
-    const messageElement = document.getElementById('countResultMsg');
-
-    console.log("responseData for countDemotable is: ");
-    console.log(responseData);
-    if (responseData.success) {
-        const tupleCount = responseData.count;
-        messageElement.textContent = `The number of tuples in demotable: ${tupleCount}`;
-    } else {
-        alert("Error in count demotable!");
+    const group = document.getElementById("nestedAggregationGroupBy").value;
+    const havingGroupSign = document.getElementById("nestedAggregationFansGroupSign").value;
+    const havingGroupConstraint = document.getElementById("nestedAggregationFansGroupConstraint").value;
+    const havingGeneralSign = document.getElementById("nestedAggregationFansGeneralSign").value;
+    const countcheck = document.querySelector('input[id="nestedAggregationID"]:checked');
+    if(countcheck) {
+        selected.push(countcheck.value);
     }
+    const checkboxes = document.querySelectorAll('input[name="nestedAggregationCheckboxes"]:checked');
+    checkboxes.forEach((checkbox) => {
+        const dropDownID = checkbox.id.replace("nestedAggregationFans", "nestedAggregationFansStat");
+        const statDropdown = document.getElementById(dropDownID);
+        selected.push(`${statDropdown.value}(P.num_fans)`);
+        console.log(selected);
+    });
+    const selectClause = selected.join(', ');
+    console.log(selected);
+    const response = await fetch('/nestedAggregation-performer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            group_by: group,
+            generalSign: havingGeneralSign,
+            havingSign: havingGroupSign,
+            havingConstraint: havingGroupConstraint,
+            select: selectClause,
+        })
+    });
+    // console.log("after fetch");
+    console.log(response);
+    const responseData = await response.json();
+    console.log(responseData);
+    const messageElement = document.getElementById('nestedAggregationResultMsg');
+
+    messageElement.textContent = "The select result is:";
+
+    const resultContainer = document.createElement('div');
+
+    if (responseData.result.length === 0) {
+        const resultRow = document.createElement('div');
+        resultRow.textContent = "No Result Found";
+        resultContainer.appendChild(resultRow);
+    } else {
+        responseData.result.forEach(rowData => {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = JSON.stringify(rowData);
+            resultContainer.appendChild(resultRow);
+        });
+    }
+
+    messageElement.appendChild(resultContainer);
+
 }
 
 async function aggregationGroupby(event) {
@@ -374,8 +476,8 @@ async function aggregationGroupby(event) {
         method: 'GET'
     });
     console.log("response is :");
-    console.log(response);  
-    console.log(response.success);  
+    console.log(response);
+    console.log(response.success);
     const responseData = await response.json();
     const messageElement = document.getElementById('aggregationGroupbyResultMsg');
 
@@ -384,7 +486,7 @@ async function aggregationGroupby(event) {
 
         const resultContainer = document.createElement('div');
 
-        if (responseData.result.length === 0){
+        if (responseData.result.length === 0) {
             const resultRow = document.createElement('div');
             resultRow.textContent = "No Result Found";
             resultContainer.appendChild(resultRow);
@@ -410,13 +512,13 @@ async function aggregationGroupby(event) {
                 // resultRow.textContent = JSON.stringify(rowData);
                 // resultContainer.appendChild(resultRow);
                 const row = document.createElement('tr');
-            
+
                 const groupIDCell = document.createElement('td');
                 groupIDCell.textContent = rowData[0];
-                
+
                 const minFansCell = document.createElement('td');
                 minFansCell.textContent = rowData[1];
-                
+
                 row.appendChild(groupIDCell);
                 row.appendChild(minFansCell);
                 resultTable.appendChild(row);
@@ -449,19 +551,18 @@ async function aggregationGroupby(event) {
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
-window.onload = function() {
+window.onload = function () {
     checkDbConnection();
     fetchTableData();
-//    fetchPerformerTableData();
+    //    fetchPerformerTableData();
 
     fetchAllTableData();
-    document.getElementById("resetDemotable").addEventListener("click", resetDemotable);
     document.getElementById("resetAll").addEventListener("click", resetAll);
-    document.getElementById("insertDemotable").addEventListener("submit", insertDemotable);
     document.getElementById("insertPerformer").addEventListener("submit", insertPerformer);
+    document.getElementById("deletePerformer").addEventListener("submit", deletePerformer);
     document.getElementById("selectPerformer").addEventListener("submit", selectPerformer);
-    document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
-    document.getElementById("countDemotable").addEventListener("click", countDemotable);
+    document.getElementById('projectionPerformer').addEventListener('submit', projectPerformer);
+    document.getElementById('nestedAggregation').addEventListener('submit', nestedAggregationPerformer);
     document.getElementById("aggregationGroupby").addEventListener("click", aggregationGroupby);
 };
 
@@ -473,7 +574,7 @@ function fetchTableData() {
 
 
 function fetchAllTableData() {
-//    fetchAndDisplayTable('demotable', '/demotable');
+    //    fetchAndDisplayTable('demotable', '/demotable');
     fetchAndDisplayTable('performer_table', '/performer');
     fetchAndDisplayTable('performer_group_table', '/performer_group');
     fetchAndDisplayTable('match_date_table', '/match_date');
