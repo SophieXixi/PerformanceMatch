@@ -309,6 +309,23 @@ async function aggregationGroupby() {
     });
 }
 
+async function division() {
+    return await withOracleDB(async (connection) => {
+        // change EXCEPT TO MINUS
+        const sqlQuery = `SELECT p.debut_year FROM Performer p WHERE NOT EXISTS (SELECT pg.groupID FROM Performer_Group pg
+        MINUS SELECT p2.groupID FROM Performer p2 WHERE p2.debut_year = p.debut_year) GROUP BY p.debut_year`;
+
+        console.log("Executing SQL Query:", sqlQuery);
+
+        const result = await connection.execute(sqlQuery);
+
+        return result.rows;
+    }).catch((error) => {
+        console.error("division Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
+    });
+}
 
 
 module.exports = {
@@ -325,5 +342,6 @@ module.exports = {
     nestedAggregation,
     updateNameDemotable, 
     countDemotable,
-    aggregationGroupby
+    aggregationGroupby,
+    division
 };
