@@ -157,6 +157,20 @@ router.get('/aggregation-groupby', async(req, res) => {
 
 })
 
+router.get('/division', async(req, res) => {
+    console.log("Received division");
+    const divisionResult = await appService.division();
+    console.log(divisionResult);
+
+    if (divisionResult && divisionResult.error) {
+        res.status(500).json({ success: false, error: divisionResult.error.message });
+    } else {
+
+        res.json({ success: true, result: divisionResult });
+    }
+
+})
+
 // test GET 
 router.get('/test', (req, res) => {
     console.log("Received test GET request");
