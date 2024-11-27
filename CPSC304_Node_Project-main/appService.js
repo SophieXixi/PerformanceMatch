@@ -208,6 +208,23 @@ async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
     });
 }
 
+async function updatePerformer(performerID, debut_year, num_fans, groupID) {
+    return await withOracleDB(async (connection) => {
+        const sqlQuery = `UPDATE Performer SET debut_year = :debut_year, num_fans = :num_fans, groupID = :groupID 
+        WHERE performerID = :performerID`;
+
+        console.log("Executing SQL Query:", sqlQuery);  
+        const result = await connection.execute(sqlQuery,
+        [ debut_year, num_fans, groupID, performerID ],
+        { autoCommit: true }
+      );
+  
+      return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+      return false;
+    });
+}
+
 async function deletePerformer(condition) {
     return await withOracleDB(async (connection) => {
         const sqlQuery = `DELETE FROM Performer WHERE ${condition}`;
@@ -254,6 +271,58 @@ async function projectPerformer(columns) {
     });
 }
 
+async function joinPerformer(performerID) {
+    return await withOracleDB(async (connection) => {
+        const sqlQuery = `
+        SELECT DISTINCT g.song_name
+        FROM Performer p, Performer_Group g
+        WHERE performerID = :performerID and p.groupID = g.groupID`;
+
+        console.log("Executing SQL Query:", sqlQuery); 
+        
+        const result = await connection.execute(sqlQuery, {performerID});
+
+        console.log(result); 
+  
+        return result.rows;
+    }).catch(() => {
+      return false;
+    });
+}
+
+
+async function aggregationGroupby() {
+    return await withOracleDB(async (connection) => {
+        const sqlQuery = `SELECT groupID, MIN(num_fans) AS min_fan FROM Performer GROUP BY groupID`;
+        console.log("Executing SQL Query:", sqlQuery); 
+
+        const result = await connection.execute(sqlQuery);
+
+        return result.rows;
+    }).catch((error) => {
+        console.error("aggregationGroupby Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
+    });
+}
+
+async function aggregationHaving(minFans) {
+    return await withOracleDB(async (connection) => {
+        const sqlQuery = `
+        SELECT groupID, SUM(num_fans) AS fans
+        FROM Performer
+        GROUP BY groupID
+        HAVING SUM(num_fans) >= :minFans`;
+        console.log("Executing SQL Query:", sqlQuery);
+        const result = await connection.execute(sqlQuery, { minFans });
+        console.log(result);
+        return result.rows;
+    }).catch(() => {
+        console.log("!performerGroupFanCount error! :");
+        return false;
+    })
+}
+
 async function nestedAggregation(group_by, generalSign, havingSign, havingConstraint, select) {
     return await withOracleDB(async (connection) => {
         const subQuery = `SELECT ${generalSign}(num_fans) FROM Performer`;
@@ -267,6 +336,24 @@ async function nestedAggregation(group_by, generalSign, havingSign, havingConstr
         console.error("nested aggregation error: ", error);
         return {error};
     })
+}
+
+async function division() {
+    return await withOracleDB(async (connection) => {
+        // change EXCEPT TO MINUS
+        const sqlQuery = `SELECT p.debut_year FROM Performer p WHERE NOT EXISTS (SELECT pg.groupID FROM Performer_Group pg
+        MINUS SELECT p2.groupID FROM Performer p2 WHERE p2.debut_year = p.debut_year) GROUP BY p.debut_year`;
+
+        console.log("Executing SQL Query:", sqlQuery);
+
+        const result = await connection.execute(sqlQuery);
+
+        return result.rows;
+    }).catch((error) => {
+        console.error("division Error:", error);
+        // return error for the router to handle and show in front end
+        return {error};
+    });
 }
 
 async function updateNameDemotable(oldName, newName) {
@@ -293,41 +380,6 @@ async function countDemotable() {
     });
 }
 
-
-async function aggregationGroupby() {
-    return await withOracleDB(async (connection) => {
-        const sqlQuery = `SELECT groupID, MIN(num_fans) AS min_fan FROM Performer GROUP BY groupID`;
-        console.log("Executing SQL Query:", sqlQuery); 
-
-        const result = await connection.execute(sqlQuery);
-
-        return result.rows;
-    }).catch((error) => {
-        console.error("aggregationGroupby Error:", error);
-        // return error for the router to handle and show in front end
-        return {error};
-    });
-}
-
-async function division() {
-    return await withOracleDB(async (connection) => {
-        // change EXCEPT TO MINUS
-        const sqlQuery = `SELECT p.debut_year FROM Performer p WHERE NOT EXISTS (SELECT pg.groupID FROM Performer_Group pg
-        MINUS SELECT p2.groupID FROM Performer p2 WHERE p2.debut_year = p.debut_year) GROUP BY p.debut_year`;
-
-        console.log("Executing SQL Query:", sqlQuery);
-
-        const result = await connection.execute(sqlQuery);
-
-        return result.rows;
-    }).catch((error) => {
-        console.error("division Error:", error);
-        // return error for the router to handle and show in front end
-        return {error};
-    });
-}
-
-
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
@@ -336,12 +388,15 @@ module.exports = {
     initiateAll,
     insertDemotable,
     insertPerformer,
+    updatePerformer,
     deletePerformer,
     selectPerformer,
     projectPerformer,
+    joinPerformer,
+    aggregationGroupby,
+    aggregationHaving,
     nestedAggregation,
+    division,
     updateNameDemotable, 
     countDemotable,
-    aggregationGroupby,
-    division
 };

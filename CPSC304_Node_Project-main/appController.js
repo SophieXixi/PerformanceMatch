@@ -76,6 +76,19 @@ router.post("/insert-performer", async (req, res) => {
     }
 });
 
+router.post("/update-performer", async (req, res) => {
+    console.log("in app controller");
+    const { performerID, debut_year, num_fans, groupID } = req.body;
+    console.log(performerID);
+    const updateResult = await appService.updatePerformer(performerID, debut_year, num_fans, groupID);
+    console.log(updateResult);
+    if (updateResult) {
+        res.json({ success: true, result: updateResult });
+    } else {
+        res.status(500).json({ success: false, message: "An error occurred while updating the performer" });
+    }
+});
+
 router.post("/delete-performer", async (req, res) => {
     console.log("in app controller");
     console.log(req);
@@ -118,6 +131,43 @@ router.post("/project-performer", async (req, res) => {
     }
 });
 
+router.post("/join-performer", async (req,res) => {
+    const {performerID} = req.body;
+    console.log("In app controller");
+    const songNameResult = await appService.joinPerformer(performerID);
+    console.log(songNameResult);
+    if (songNameResult) {
+        res.json({ success: true, result: songNameResult });
+    } else {
+        res.status(500).json({ success: false, message: "An error occurred while retrieving songs" });
+    }
+});
+
+router.get('/aggregation-groupby', async(req, res) => {
+    console.log("Received aggregation-groupby"); 
+    const aggregationResult = await appService.aggregationGroupby();
+    console.log(aggregationResult);
+
+    if (aggregationResult && aggregationResult.error) {
+        res.status(500).json({ success: false, error: aggregationResult.error.message });
+    } else {
+        
+        res.json({ success: true, result: aggregationResult });
+    }
+});
+
+router.post("/aggregation-having", async (req, res) => {
+    const {minFans} = req.body;
+    console.log("Received aggregation-groupby-having");
+    const fanCountResult = await appService.aggregationHaving(minFans); 
+    console.log(fanCountResult);
+    if (!fanCountResult) {
+        res.status(500).json({ success: false, message: "An error occured while retrieving fan count" });
+    } else {
+        res.json({ success: true, result: fanCountResult });
+    }
+});
+
 router.post("/nestedAggregation-performer", async (req, res) => {
     console.log("in app controller");
     console.log(req);
@@ -132,31 +182,6 @@ router.post("/nestedAggregation-performer", async (req, res) => {
     }
 });
 
-router.post("/update-name-demotable", async (req, res) => {
-    const { oldName, newName } = req.body;
-    const updateResult = await appService.updateNameDemotable(oldName, newName);
-    if (updateResult) {
-        res.json({ success: true });
-    } else {
-        res.status(500).json({ success: false });
-    }
-});
-
-
-router.get('/aggregation-groupby', async(req, res) => {
-    console.log("Received aggregation-groupby"); 
-    const aggregationResult = await appService.aggregationGroupby();
-    console.log(aggregationResult);
-
-    if (aggregationResult && aggregationResult.error) {
-        res.status(500).json({ success: false, error: aggregationResult.error.message });
-    } else {
-        
-        res.json({ success: true, result: aggregationResult });
-    }
-
-})
-
 router.get('/division', async(req, res) => {
     console.log("Received division");
     const divisionResult = await appService.division();
@@ -170,6 +195,16 @@ router.get('/division', async(req, res) => {
     }
 
 })
+
+router.post("/update-name-demotable", async (req, res) => {
+    const { oldName, newName } = req.body;
+    const updateResult = await appService.updateNameDemotable(oldName, newName);
+    if (updateResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
 
 // test GET 
 router.get('/test', (req, res) => {
