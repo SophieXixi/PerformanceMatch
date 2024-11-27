@@ -148,7 +148,6 @@ async function addACondition() {
     container.appendChild(newConditionContainer);
 }
 
-
 // Inserts new records into the demotable.
 async function insertDemotable(event) {
     event.preventDefault();
@@ -216,6 +215,35 @@ async function insertPerformer(event) {
     }
 }
 
+async function updatePerformer(event) {
+    event.preventDefault();
+    const performerID = document.getElementById('performerID').value;
+    const debutYearValue = document.getElementById('updateDebutYear').value;
+    const numOfFansValue = document.getElementById('updateNumFans').value;
+    const groupIdValue = document.getElementById('updateGroupID').value;
+
+    const response = await fetch('/update-performer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            performerID: performerID,
+            debut_year: debutYearValue,
+            num_fans: numOfFansValue,
+            groupID: groupIdValue
+        })
+    });
+    const responseData = await response.json();
+    const messageElement = document.getElementById('updatePerformerResultMsg');
+    if (responseData.success) {
+        messageElement.textContent = "Performer updated successfully!";
+
+        fetchTableData;
+    } else {
+        messageElement.textContent = "Error updating performer!";
+    }
+}
 
 async function deletePerformer(event) {
     console.log("in delete performer scripts.js");
@@ -279,7 +307,6 @@ async function deletePerformer(event) {
 
     const resultContainer = document.createElement('div');
 }
-
 
 // Selects from performer table based on conditions.
 async function selectPerformer(event) {
@@ -408,6 +435,127 @@ async function projectPerformer(event) {
 
 }
 
+async function joinPerformer(event) {
+    event.preventDefault();
+    const performerID = document.getElementById('joinPerformerID').value;
+    const response = await fetch('/join-performer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ performerID: performerID })
+    });
+
+    console.log("after fetch");
+    console.log(response);
+    const responseData = await response.json();
+    const messageElement = document.getElementById('joinPerformerResultMsg');
+    console.log(responseData);
+    console.log(" in scripts");
+    if (responseData.success) {
+        console.log("Full success now displaying song performed");
+        messageElement.textContent = `Song performed: ${JSON.stringify(responseData.result)}`;
+    } else {
+        messageElement.textContent = "Error finding song!";
+    }
+}
+
+async function aggregationGroupby(event) {
+    event.preventDefault();
+    console.log("aggregationGroupby start");
+    const response = await fetch("/aggregation-groupby", {
+        method: 'GET'
+    });
+    console.log("response is :");
+    console.log(response);
+    console.log(response.success);
+    const responseData = await response.json();
+    const messageElement = document.getElementById('aggregationGroupbyResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "The result is:";
+
+        const resultContainer = document.createElement('div');
+
+        if (responseData.result.length === 0) {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            // Create a table to put the results with headers
+            const resultTable = document.createElement('table');
+            resultTable.setAttribute("border", "1");
+            const headerRow = document.createElement('tr');
+            const groupIDHeader = document.createElement('th');
+            groupIDHeader.textContent = 'Group ID';
+            const minFansHeader = document.createElement('th');
+            minFansHeader.textContent = 'Minimum Fans';
+
+            // put <th> in <tr>
+            headerRow.appendChild(groupIDHeader);
+            headerRow.appendChild(minFansHeader);
+
+            // put <tr> in <table>
+            resultTable.appendChild(headerRow);
+
+            responseData.result.forEach(rowData => {
+                // const resultRow = document.createElement('div');
+                // resultRow.textContent = JSON.stringify(rowData);
+                // resultContainer.appendChild(resultRow);
+                const row = document.createElement('tr');
+
+                const groupIDCell = document.createElement('td');
+                groupIDCell.textContent = rowData[0];
+
+                const minFansCell = document.createElement('td');
+                minFansCell.textContent = rowData[1];
+
+                row.appendChild(groupIDCell);
+                row.appendChild(minFansCell);
+                resultTable.appendChild(row);
+            });
+            resultContainer.appendChild(resultTable);
+        }
+        messageElement.appendChild(resultContainer);
+        fetchTableData;
+        // console.log("aggregationGroupby success");
+        // messageElement.textContent = `The result is: ${responseData.result}`;
+        // fetchPerformerTableDataData();
+        // fetchTableData;
+    } else {
+        // // messageElement.textContent = "Error inserting data!";
+        // console.log("aggregationGroupby fail");
+        // console.log("responseData is :");
+        // console.log(responseData);
+        const errorMessage = responseData.error ? responseData.error : "Error aggregationGroupby!";
+        messageElement.textContent = errorMessage;
+    }
+}
+
+async function aggregationHaving(event) {
+    event.preventDefault();
+    const minFans = document.getElementById('minFans').value;
+    const response = await fetch('/aggregation-having', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ minFans: minFans })
+    });
+    console.log("after fetch");
+    console.log(response);
+    const responseData = await response.json();
+    const messageElement = document.getElementById('performerGroupByFanCountResultMsg');
+    console.log(responseData);
+    console.log(" in scripts");
+    if (responseData.success) {
+        console.log(" Full success now displaying fan counts");
+        messageElement.textContent = `Fan counts: ${JSON.stringify(responseData.result)}`;
+    } else {
+        messageElement.textContent = "Error in finding number of fans with minimum";
+    } 
+}
+
 async function nestedAggregationPerformer(event) {
     console.log("in nested aggregation performer scripts.js");
     event.preventDefault();
@@ -469,23 +617,20 @@ async function nestedAggregationPerformer(event) {
 
 }
 
-async function aggregationGroupby(event) {
+async function division(event) {
     event.preventDefault();
-    console.log("aggregationGroupby start");
-    const response = await fetch("/aggregation-groupby", {
+    console.log("division start");
+    const response = await fetch("/division", {
         method: 'GET'
     });
     console.log("response is :");
     console.log(response);
     console.log(response.success);
     const responseData = await response.json();
-    const messageElement = document.getElementById('aggregationGroupbyResultMsg');
-
+    const messageElement = document.getElementById('divisionResultMsg');
     if (responseData.success) {
         messageElement.textContent = "The result is:";
-
         const resultContainer = document.createElement('div');
-
         if (responseData.result.length === 0) {
             const resultRow = document.createElement('div');
             resultRow.textContent = "No Result Found";
@@ -495,55 +640,36 @@ async function aggregationGroupby(event) {
             const resultTable = document.createElement('table');
             resultTable.setAttribute("border", "1");
             const headerRow = document.createElement('tr');
-            const groupIDHeader = document.createElement('th');
-            groupIDHeader.textContent = 'Group ID';
-            const minFansHeader = document.createElement('th');
-            minFansHeader.textContent = 'Minimum Fans';
-
-            // put <th> in <tr>
-            headerRow.appendChild(groupIDHeader);
-            headerRow.appendChild(minFansHeader);
-
-            // put <tr> in <table>
+            const debutYearHeader = document.createElement('th');
+            debutYearHeader.textContent = 'debut year';
+            // const minFansHeader = document.createElement('th');
+            // minFansHeader.textContent = 'Minimum Fans';
+            headerRow.appendChild(debutYearHeader);
+            // headerRow.appendChild(minFansHeader);
             resultTable.appendChild(headerRow);
-
             responseData.result.forEach(rowData => {
-                // const resultRow = document.createElement('div');
-                // resultRow.textContent = JSON.stringify(rowData);
-                // resultContainer.appendChild(resultRow);
                 const row = document.createElement('tr');
-
-                const groupIDCell = document.createElement('td');
-                groupIDCell.textContent = rowData[0];
-
-                const minFansCell = document.createElement('td');
-                minFansCell.textContent = rowData[1];
-
-                row.appendChild(groupIDCell);
-                row.appendChild(minFansCell);
+                const debutYearCell = document.createElement('td');
+                debutYearCell.textContent = rowData[0];
+                // const minFansCell = document.createElement('td');
+                // minFansCell.textContent = rowData[1];
+                row.appendChild(debutYearCell);
                 resultTable.appendChild(row);
             });
             resultContainer.appendChild(resultTable);
         }
-
         messageElement.appendChild(resultContainer);
         fetchTableData;
-
-
-
-
         // console.log("aggregationGroupby success");
-
         // messageElement.textContent = `The result is: ${responseData.result}`;
         // fetchPerformerTableDataData();
         // fetchTableData;
     } else {
-
         // // messageElement.textContent = "Error inserting data!";
         // console.log("aggregationGroupby fail");
         // console.log("responseData is :");
         // console.log(responseData);
-        const errorMessage = responseData.error ? responseData.error : "Error aggregationGroupby!";
+        const errorMessage = responseData.error ? responseData.error : "Error division!";
         messageElement.textContent = errorMessage;
     }
 }
@@ -554,16 +680,19 @@ async function aggregationGroupby(event) {
 window.onload = function () {
     checkDbConnection();
     fetchTableData();
-    //    fetchPerformerTableData();
-
+    // fetchPerformerTableData();
     fetchAllTableData();
     document.getElementById("resetAll").addEventListener("click", resetAll);
     document.getElementById("insertPerformer").addEventListener("submit", insertPerformer);
+    document.getElementById("updatePerformer").addEventListener("submit", updatePerformer);
     document.getElementById("deletePerformer").addEventListener("submit", deletePerformer);
     document.getElementById("selectPerformer").addEventListener("submit", selectPerformer);
     document.getElementById('projectionPerformer').addEventListener('submit', projectPerformer);
-    document.getElementById('nestedAggregation').addEventListener('submit', nestedAggregationPerformer);
+    document.getElementById("findSongForPerformer").addEventListener("submit", joinPerformer);
     document.getElementById("aggregationGroupby").addEventListener("click", aggregationGroupby);
+    document.getElementById("performerGroupByFanCount").addEventListener("submit", aggregationHaving);
+    document.getElementById('nestedAggregation').addEventListener('submit', nestedAggregationPerformer);
+    document.getElementById("division").addEventListener("click", division);
 };
 
 // General function to refresh the displayed table data.
