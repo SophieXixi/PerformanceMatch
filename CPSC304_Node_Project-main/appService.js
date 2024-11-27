@@ -380,8 +380,6 @@ async function countDemotable() {
     });
 }
 
-
-
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
