@@ -240,7 +240,6 @@ async function deletePerformer(condition) {
     });
 }
 
-//TODO
 async function selectPerformer(condition) {
     return await withOracleDB(async (connection) => {
         const sqlQuery = `SELECT * FROM Performer WHERE ${condition}`;
