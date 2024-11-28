@@ -186,6 +186,11 @@ async function insertPerformer(event) {
     const debutYearValue = document.getElementById('insertDebutYear').value;
     const numOfFansValue = document.getElementById('insertNumOfFans').value;
     const groupIdValue = document.getElementById('insertGroupId').value;
+    // error handling: if ID is less than 0
+    if (parseInt(idValue, 10) < 0) {
+        alert('Error: ID cannot be less than 0');
+        return;
+    }
 
     const response = await fetch('/insert-performer', {
         method: 'POST',
@@ -340,7 +345,7 @@ async function selectPerformer(event) {
         const opValue = selectionContainer.querySelector('.operator-dropdown').value;
         const inputValue = selectionContainer.querySelector('.value-input').value;
 
-        const formattedInputValue = isNaN(inputValue) ? `'${inputValue}'` : inputValue;
+        const formattedInputValue = isNaN(inputValue) || attValue === "performer_name" ? `'${inputValue}'` : inputValue;
 
         const conditionString = `${attValue} ${opValue} ${formattedInputValue}`;
 
