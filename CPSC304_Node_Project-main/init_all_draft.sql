@@ -41,7 +41,7 @@ CREATE TABLE Band (
     performerID INTEGER NOT NULL,
     PRIMARY KEY (performerID),
     FOREIGN KEY (performerID) REFERENCES Performer(performerID)
-    	ON DELETE SET DEFAULT
+    	ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
 
@@ -52,7 +52,7 @@ CREATE TABLE Singer_R1 (
     birth_date DATE,
     PRIMARY KEY (performerID),
     FOREIGN KEY (performerID) REFERENCES Performer(performerID)
-    	ON DELETE SET DEFAULT
+    	ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
 
@@ -174,7 +174,7 @@ CREATE TABLE AudienceVote (
         ON DELETE SET DEFAULT
 		ON UPDATE CASCADE
     FOREIGN KEY (performerID) REFERENCES Performer(performerID)
-        ON DELETE SET DEFAULT
+        ON DELETE CASCADE
 		ON UPDATE CASCADE
 );
 
