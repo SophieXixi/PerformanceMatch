@@ -78,9 +78,9 @@ router.post("/insert-performer", async (req, res) => {
 
 router.post("/update-performer", async (req, res) => {
     console.log("in app controller");
-    const { performerID, debut_year, num_fans, groupID } = req.body;
+    const { performerID, performer_name, debut_year, num_fans, groupID } = req.body;
     console.log(performerID);
-    const updateResult = await appService.updatePerformer(performerID, debut_year, num_fans, groupID);
+    const updateResult = await appService.updatePerformer(performerID, performer_name, debut_year, num_fans, groupID);
     console.log(updateResult);
     if (updateResult) {
         res.json({ success: true, result: updateResult });
@@ -134,7 +134,7 @@ router.post("/project-performer", async (req, res) => {
 router.post("/join-performer", async (req,res) => {
     const {performerID} = req.body;
     console.log("In app controller");
-    const songNameResult = await appService.joinPerformer(performerID);
+    const songNameResult = await appService.joinPerformerWithGroup(performerID);
     console.log(songNameResult);
     if (songNameResult) {
         res.json({ success: true, result: songNameResult });
@@ -159,8 +159,9 @@ router.get('/aggregation-groupby', async(req, res) => {
 router.post("/aggregation-having", async (req, res) => {
     const {minFans} = req.body;
     console.log("Received aggregation-groupby-having");
-    const fanCountResult = await appService.aggregationHaving(minFans); 
+    const fanCountResult = await appService.performerGroupByFanCount(minFans); 
     console.log(fanCountResult);
+
     if (!fanCountResult) {
         res.status(500).json({ success: false, message: "An error occured while retrieving fan count" });
     } else {

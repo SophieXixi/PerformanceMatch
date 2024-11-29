@@ -145,13 +145,14 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 </form>
 <div id="insertPerformerResultMsg"></div>
 
-<h2>2.1.2 Update Performer</h2>
-<p>Update the debut year, number of fans, and group ID for a performer based on their ID.</p>
+<h2>Update Performer</h2>
+<p>Update the performer name, debut year, number of fans, *and/or* group ID for a performer based on their ID.</p>
 <form id="updatePerformer">
     Performer ID: <input type="number" id="performerID" placeholder="Enter Performer ID" required> <br><br>
-    Debut Year: <input type="number" id="updateDebutYear" placeholder="Enter Debut Year" required> <br><br>
-    Number of Fans: <input type="number" id="updateNumFans" placeholder="Enter Number of Fans" required> <br><br>
-    Group ID: <input type="number" id="updateGroupID" placeholder="Enter Group ID" required> <br><br>
+    Performer Name: <input type="text" id="updatePerformerName" placeholder="Enter Performer Name" maxlength="20"> <br><br>
+    Debut Year: <input type="number" id="updateDebutYear" placeholder="Enter Debut Year"> <br><br>
+    Number of Fans: <input type="number" id="updateNumFans" placeholder="Enter Number of Fans"> <br><br>
+    Group ID: <input type="number" id="updateGroupID" placeholder="Enter Group ID"> <br><br>
     <button type="submit">Update Performer</button> <br>
 </form>
 <div id="updatePerformerResultMsg"></div>

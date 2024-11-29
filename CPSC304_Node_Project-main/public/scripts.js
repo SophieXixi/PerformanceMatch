@@ -223,16 +223,17 @@ async function insertPerformer(event) {
 async function updatePerformer(event) {
     event.preventDefault();
     const performerID = document.getElementById('performerID').value;
+    const performerNameValue = document.getElementById('updatePerformerName').value;
     const debutYearValue = document.getElementById('updateDebutYear').value;
     const numOfFansValue = document.getElementById('updateNumFans').value;
     const groupIdValue = document.getElementById('updateGroupID').value;
-
     const response = await fetch('/update-performer', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            performer_name: performerNameValue,
             performerID: performerID,
             debut_year: debutYearValue,
             num_fans: numOfFansValue,
@@ -243,7 +244,6 @@ async function updatePerformer(event) {
     const messageElement = document.getElementById('updatePerformerResultMsg');
     if (responseData.success) {
         messageElement.textContent = "Performer updated successfully!";
-
         fetchTableData;
     } else {
         messageElement.textContent = "Error updating performer!";
@@ -451,18 +451,20 @@ async function joinPerformer(event) {
         },
         body: JSON.stringify({ performerID: performerID })
     });
-
     console.log("after fetch");
     console.log(response);
     const responseData = await response.json();
     const messageElement = document.getElementById('joinPerformerResultMsg');
     console.log(responseData);
     console.log(" in scripts");
-    if (responseData.success) {
+    if (!responseData.success) {
+        messageElement.textContent = "Error finding song!";
+    } else if (responseData.result && responseData.result.length > 0) {
         console.log("Full success now displaying song performed");
         messageElement.textContent = `Song performed: ${JSON.stringify(responseData.result)}`;
     } else {
-        messageElement.textContent = "Error finding song!";
+        console.log("Invalid performerID");
+        messageElement.textContent = "Could not find valid performerID";
     }
 }
 
@@ -554,9 +556,12 @@ async function aggregationHaving(event) {
     const messageElement = document.getElementById('performerGroupByFanCountResultMsg');
     console.log(responseData);
     console.log(" in scripts");
-    if (responseData.success) {
+    if (responseData.success && (responseData.result && responseData.result.length > 0)) {
         console.log(" Full success now displaying fan counts");
-        messageElement.textContent = `Fan counts: ${JSON.stringify(responseData.result)}`;
+        messageElement.textContent = `Fan counts (GroupId, Number of Fans): ${JSON.stringify(responseData.result)}`;
+    } else if (!(responseData.result && responseData.result.length > 0)) {
+        console.log(" No groups with valid condition ");
+        messageElement.textContent = "No groups found.";
     } else {
         messageElement.textContent = "Error in finding number of fans with minimum";
     } 
