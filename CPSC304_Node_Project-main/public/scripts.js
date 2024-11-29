@@ -95,7 +95,7 @@ async function resetAll() {
     if (responseData.success) {
         const messageElement = document.getElementById('resetAllResultMsg');
         messageElement.textContent = "all tables initiated successfully!";
-        fetchPerformerTableData();
+        // fetchPerformerTableData();
     } else {
         alert("Error initiating all table!");
     }
@@ -286,26 +286,28 @@ async function deletePerformer(event) {
         allconditions.push(`groupID = ${groupID}`);
     }
     console.log(allconditions);
-    fullcondition = allconditions.join(" and ");
-    console.log(fullcondition);
-    const response = await fetch('/delete-performer', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            condition: fullcondition
-        })
-    });
-    console.log("after fetch");
-    console.log(response);
-    const responseData = await response.json();
-    console.log(responseData);
     const messageElement = document.getElementById('deletePerformerResultMsg');
-
-    messageElement.textContent = "TODO!!! on cascade delete";
-
-    const resultContainer = document.createElement('div');
+    if (allconditions.length == 0) {
+        messageElement.textContent = "Please enter at least one value";
+    } else {
+        fullcondition = allconditions.join(" and ");
+        console.log(fullcondition);
+        const response = await fetch('/delete-performer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                condition: fullcondition
+            })
+        });
+        console.log("after fetch");
+        console.log(response);
+        const responseData = await response.json();
+        console.log(responseData);
+        messageElement.textContent = "TODO!!! on cascade delete";
+        const resultContainer = document.createElement('div');
+    }
 }
 
 // Selects from performer table based on conditions.
@@ -398,41 +400,40 @@ async function projectPerformer(event) {
     checkboxes.forEach((checkbox) => {
         selectedColumns.push(checkbox.value);
     });
-    const selected = selectedColumns.join(', ');
-    console.log(selected);
-    const response = await fetch('/project-performer', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            columns: selected
-        })
-    });
-    console.log("after fetch");
-    console.log(response);
-    const responseData = await response.json();
-    console.log(responseData);
     const messageElement = document.getElementById('ProjectionPerformerResultMsg');
-
-    messageElement.textContent = "The select result is:";
-
-    const resultContainer = document.createElement('div');
-
-    if (responseData.result.length === 0) {
-        const resultRow = document.createElement('div');
-        resultRow.textContent = "No Result Found";
-        resultContainer.appendChild(resultRow);
+    if (selectedColumns.length == 0) {
+        messageElement.textContent = "Please select at least one field.\n";
     } else {
-        responseData.result.forEach(rowData => {
-            const resultRow = document.createElement('div');
-            resultRow.textContent = JSON.stringify(rowData);
-            resultContainer.appendChild(resultRow);
+        const selected = selectedColumns.join(', ');
+        console.log(selected);
+        const response = await fetch('/project-performer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                columns: selected
+            })
         });
+        console.log("after fetch");
+        console.log(response);
+        const responseData = await response.json();
+        console.log(responseData);
+        messageElement.textContent = "The select result is: (in order)";
+        const resultContainer = document.createElement('div');
+        if (responseData.result.length === 0) {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            responseData.result.forEach(rowData => {
+                const resultRow = document.createElement('div');
+                resultRow.textContent = JSON.stringify(rowData);
+                resultContainer.appendChild(resultRow);
+            });
+        }
+        messageElement.appendChild(resultContainer);
     }
-
-    messageElement.appendChild(resultContainer);
-
 }
 
 async function joinPerformer(event) {
@@ -576,45 +577,47 @@ async function nestedAggregationPerformer(event) {
         selected.push(`${statDropdown.value}(P.num_fans)`);
         console.log(selected);
     });
-    const selectClause = selected.join(', ');
-    console.log(selected);
-    const response = await fetch('/nestedAggregation-performer', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            group_by: group,
-            generalSign: havingGeneralSign,
-            havingSign: havingGroupSign,
-            havingConstraint: havingGroupConstraint,
-            select: selectClause,
-        })
-    });
-    // console.log("after fetch");
-    console.log(response);
-    const responseData = await response.json();
-    console.log(responseData);
     const messageElement = document.getElementById('nestedAggregationResultMsg');
-
-    messageElement.textContent = "The select result is:";
-
-    const resultContainer = document.createElement('div');
-
-    if (responseData.result.length === 0) {
-        const resultRow = document.createElement('div');
-        resultRow.textContent = "No Result Found";
-        resultContainer.appendChild(resultRow);
+    if (selected.length == 0) {
+        messageElement.textContent = "Please select at least one column\n";
     } else {
-        responseData.result.forEach(rowData => {
-            const resultRow = document.createElement('div');
-            resultRow.textContent = JSON.stringify(rowData);
-            resultContainer.appendChild(resultRow);
+        const selectClause = selected.join(', ');
+        console.log(selected);
+        const response = await fetch('/nestedAggregation-performer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                group_by: group,
+                generalSign: havingGeneralSign,
+                havingSign: havingGroupSign,
+                havingConstraint: havingGroupConstraint,
+                select: selectClause,
+            })
         });
+        // console.log("after fetch");
+        console.log(response);
+        const responseData = await response.json();
+        console.log(responseData);
+    
+        messageElement.textContent = "The select result is: (first column is the debut year)";
+    
+        const resultContainer = document.createElement('div');
+    
+        if (responseData.result.length === 0) {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            responseData.result.forEach(rowData => {
+                const resultRow = document.createElement('div');
+                resultRow.textContent = JSON.stringify(rowData);
+                resultContainer.appendChild(resultRow);
+            });
+        }
+        messageElement.appendChild(resultContainer);
     }
-
-    messageElement.appendChild(resultContainer);
-
 }
 
 async function division(event) {
