@@ -218,7 +218,9 @@ router.get('/test', (req, res) => {
 // Put validateTableName and dynamic router in the end
 const validateTableName = (req, res, next) => {
     // console.log("Table name received:", req.params.tableName);
-    const validTables = ['performer_group', 'performer', 'song', 'artist', 'match_date', 'demotable']; 
+    const validTables = ['performer_group', 'performer', 'song', 'artist', 'match_date', 'band', 'singer_r1',
+        'singer_r2', 'sponsor', 'audience_info', 'audience_ticket', 'judge', 'match_addr', 'match_cap',
+        'match_winner', 'judgevote', 'audiencevote', 'supports', 'demotable']; 
     if (!validTables.includes(req.params.tableName)) {
 
         return res.status(404).json({ error: 'Invalid table name' });
@@ -237,7 +239,5 @@ router.get('/:tableName', validateTableName, async (req, res) => {
 router.use((req, res) => {
     res.status(404).json({ error: 'Route not found' });
 });
-
-
 
 module.exports = router;

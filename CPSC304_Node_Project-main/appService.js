@@ -123,34 +123,113 @@ const path = require('path');
 async function initiateAll() {
     return await withOracleDB(async (connection) => {
         try {
-            await connection.execute(`DROP TABLE Performer`);
+            await connection.execute(`DROP TABLE Performer CASCADE CONSTRAINTS`);
         } catch (err) {
             console.log('Table Performer might not exist, proceeding to next...');
         }
 
         try {
-            await connection.execute(`DROP TABLE Performer_Group`);
+            await connection.execute(`DROP TABLE Performer_Group CASCADE CONSTRAINTS`);
         } catch (err) {
             console.log('Table Performer_Group might not exist, proceeding to next...');
         }
 
         try {
-            await connection.execute(`DROP TABLE Song`);
+            await connection.execute(`DROP TABLE Song CASCADE CONSTRAINTS`);
         } catch (err) {
             console.log('Table Song might not exist, proceeding to next...');
         }
 
         try {
-            await connection.execute(`DROP TABLE Match_Date`);
+            await connection.execute(`DROP TABLE Match_Date CASCADE CONSTRAINTS`);
         } catch (err) {
             console.log('Table Match_Date might not exist, proceeding to next...');
         }
 
         try {
-            await connection.execute(`DROP TABLE Artist`);
+            await connection.execute(`DROP TABLE Artist CASCADE CONSTRAINTS`);
         } catch (err) {
             console.log('Table Artist might not exist, proceeding to next...');
         }
+
+        try {
+            await connection.execute(`DROP TABLE Band CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Band might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Singer_R1 CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Singer_R1 might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Singer_R2 CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Singer_R2 might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Sponsor CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Sponsor might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Audience_Ticket CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Audience_Ticket might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Audience_Info CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Audience_Info might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Judge CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Judge might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Match_Addr CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Match_Addr might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Match_Cap CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Match_Cap might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Match_Winner CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Match_Winner might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE JudgeVote CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table JudgeVote might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE AudienceVote CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table AudienceVote might not exist, proceeding to next...');
+        }
+
+        try {
+            await connection.execute(`DROP TABLE Supports CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log('Table Supports might not exist, proceeding to next...');
+        }
+
         try {
             const sqlFilePath = path.join(__dirname, 'init_all.sql');
             const sql = await fs.readFile(sqlFilePath, 'utf8');
@@ -175,7 +254,6 @@ async function initiateAll() {
         return false;
     });
 }
-
 
 
 async function insertDemotable(id, name) {
