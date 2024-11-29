@@ -186,6 +186,11 @@ async function insertPerformer(event) {
     const debutYearValue = document.getElementById('insertDebutYear').value;
     const numOfFansValue = document.getElementById('insertNumOfFans').value;
     const groupIdValue = document.getElementById('insertGroupId').value;
+    // error handling: if ID is less than 0
+    if (parseInt(idValue, 10) < 0) {
+        alert('Error: ID cannot be less than 0');
+        return;
+    }
 
     const response = await fetch('/insert-performer', {
         method: 'POST',
@@ -342,7 +347,7 @@ async function selectPerformer(event) {
         const opValue = selectionContainer.querySelector('.operator-dropdown').value;
         const inputValue = selectionContainer.querySelector('.value-input').value;
 
-        const formattedInputValue = isNaN(inputValue) ? `'${inputValue}'` : inputValue;
+        const formattedInputValue = isNaN(inputValue) || attValue === "performer_name" ? `'${inputValue}'` : inputValue;
 
         const conditionString = `${attValue} ${opValue} ${formattedInputValue}`;
 
@@ -676,6 +681,83 @@ async function division(event) {
         messageElement.textContent = errorMessage;
     }
 }
+
+
+
+
+async function division(event) {
+    event.preventDefault();
+    console.log("division start");
+    const response = await fetch("/division", {
+        method: 'GET'
+    });
+    console.log("response is :");
+    console.log(response);
+    console.log(response.success);
+    const responseData = await response.json();
+    const messageElement = document.getElementById('divisionResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "The result is:";
+
+        const resultContainer = document.createElement('div');
+
+        if (responseData.result.length === 0) {
+            const resultRow = document.createElement('div');
+            resultRow.textContent = "No Result Found";
+            resultContainer.appendChild(resultRow);
+        } else {
+            // Create a table to put the results with headers
+            const resultTable = document.createElement('table');
+            resultTable.setAttribute("border", "1");
+            const headerRow = document.createElement('tr');
+            const debutYearHeader = document.createElement('th');
+            debutYearHeader.textContent = 'debut year';
+//            const minFansHeader = document.createElement('th');
+//            minFansHeader.textContent = 'Minimum Fans';
+
+            headerRow.appendChild(debutYearHeader);
+//            headerRow.appendChild(minFansHeader);
+            resultTable.appendChild(headerRow);
+
+            responseData.result.forEach(rowData => {
+                const row = document.createElement('tr');
+
+                const debutYearCell = document.createElement('td');
+                debutYearCell.textContent = rowData[0];
+
+//                const minFansCell = document.createElement('td');
+//                minFansCell.textContent = rowData[1];
+
+                row.appendChild(debutYearCell);
+//                row.appendChild(minFansCell);
+                resultTable.appendChild(row);
+            });
+            resultContainer.appendChild(resultTable);
+        }
+
+        messageElement.appendChild(resultContainer);
+        fetchTableData;
+
+
+
+
+        // console.log("aggregationGroupby success");
+
+        // messageElement.textContent = `The result is: ${responseData.result}`;
+        // fetchPerformerTableDataData();
+        // fetchTableData;
+    } else {
+
+        // // messageElement.textContent = "Error inserting data!";
+        // console.log("aggregationGroupby fail");
+        // console.log("responseData is :");
+        // console.log(responseData);
+        const errorMessage = responseData.error ? responseData.error : "Error division!";
+        messageElement.textContent = errorMessage;
+    }
+}
+
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
