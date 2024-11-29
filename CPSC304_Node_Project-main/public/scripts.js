@@ -263,11 +263,15 @@ async function deletePerformer(event) {
     const numberFans = document.getElementById("deletePerformerFans").value;
     const groupID = document.getElementById("deletePerformerGroup").value;
     
+
+
     if (performerID) {
         allconditions.push(`performerID = ${performerID}`);
     }
     if (performerName) {
-        allconditions.push(`performer_name = "${performerName}"`);
+        // const formattedInputValue = isNaN(performerName) || attValue === "performer_name" ? `'${inputValue}'` : inputValue;
+
+        allconditions.push(`performer_name = '${performerName}'`);
     }
     if (debutYearConstraint != " " && debutYear) {
         if (debutYearConstraint == "<") {
@@ -310,7 +314,7 @@ async function deletePerformer(event) {
         console.log(response);
         const responseData = await response.json();
         console.log(responseData);
-        messageElement.textContent = "TODO!!! on cascade delete";
+        messageElement.textContent = response.statusText;
         const resultContainer = document.createElement('div');
     }
 }

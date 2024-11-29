@@ -134,7 +134,7 @@ router.post("/project-performer", async (req, res) => {
 router.post("/join-performer", async (req,res) => {
     const {performerID} = req.body;
     console.log("In app controller");
-    const songNameResult = await appService.joinPerformerWithGroup(performerID);
+    const songNameResult = await appService.joinPerformer(performerID);
     console.log(songNameResult);
     if (songNameResult) {
         res.json({ success: true, result: songNameResult });
@@ -144,14 +144,14 @@ router.post("/join-performer", async (req,res) => {
 });
 
 router.get('/aggregation-groupby', async(req, res) => {
-    console.log("Received aggregation-groupby"); 
+    console.log("Received aggregation-groupby");
     const aggregationResult = await appService.aggregationGroupby();
     console.log(aggregationResult);
 
     if (aggregationResult && aggregationResult.error) {
         res.status(500).json({ success: false, error: aggregationResult.error.message });
     } else {
-        
+
         res.json({ success: true, result: aggregationResult });
     }
 });
@@ -159,7 +159,7 @@ router.get('/aggregation-groupby', async(req, res) => {
 router.post("/aggregation-having", async (req, res) => {
     const {minFans} = req.body;
     console.log("Received aggregation-groupby-having");
-    const fanCountResult = await appService.performerGroupByFanCount(minFans); 
+    const fanCountResult = await appService.aggregationHaving(minFans);
     console.log(fanCountResult);
 
     if (!fanCountResult) {
