@@ -210,15 +210,34 @@ async function insertPerformer(id, name, debutYear, numOfFans, groupId) {
 
 async function updatePerformer(performerID, debut_year, num_fans, groupID) {
     return await withOracleDB(async (connection) => {
-        const sqlQuery = `UPDATE Performer SET debut_year = :debut_year, num_fans = :num_fans, groupID = :groupID 
-        WHERE performerID = :performerID`;
-
+        let sqlQuery = "UPDATE Performer SET ";
+        const parameters = {};
+        const updates = [];
+        console.log(sqlQuery);
+        console.log(groupID);
+        parameters.performerID = performerID;
+        if (performer_name !== "") {
+            updates.push("performer_name = :performer_name");
+            parameters.performer_name = performer_name;
+        }
+        if (debut_year !== "") {
+            updates.push("debut_year = :debut_year");
+            parameters.debut_year = debut_year;
+        }
+        if (num_fans !== "") {
+            updates.push("num_fans = :num_fans");
+            parameters.num_fans = num_fans;
+        }
+        if (groupID !== "") {
+            updates.push("groupID = :groupID");
+            parameters.groupID = groupID;
+            console.log("passed through groupID added");
+        }
+        sqlQuery += updates.join(", ") + " WHERE performerID = :performerID";
+        //const sqlQuery = `UPDATE Performer SET debut_year = :debut_year, num_fans = :num_fans, groupID = :groupID 
+        //WHERE performerID = :performerID`;
         console.log("Executing SQL Query:", sqlQuery);  
-        const result = await connection.execute(sqlQuery,
-        [ debut_year, num_fans, groupID, performerID ],
-        { autoCommit: true }
-      );
-  
+        const result = await connection.execute(sqlQuery, parameters, { autoCommit: true } );
       return result.rowsAffected && result.rowsAffected > 0;
     }).catch(() => {
       return false;
@@ -276,13 +295,9 @@ async function joinPerformer(performerID) {
         SELECT DISTINCT g.song_name
         FROM Performer p, Performer_Group g
         WHERE performerID = :performerID and p.groupID = g.groupID`;
-
         console.log("Executing SQL Query:", sqlQuery); 
-        
         const result = await connection.execute(sqlQuery, {performerID});
-
         console.log(result); 
-  
         return result.rows;
     }).catch(() => {
       return false;
