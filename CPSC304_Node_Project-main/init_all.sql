@@ -1,3 +1,22 @@
+DROP TABLE Performer CASCADE CONSTRAINTS;
+DROP TABLE Performer_Group CASCADE CONSTRAINTS;
+DROP TABLE Song CASCADE CONSTRAINTS;
+DROP TABLE Match_Date CASCADE CONSTRAINTS;
+DROP TABLE Artist CASCADE CONSTRAINTS;
+DROP TABLE Band CASCADE CONSTRAINTS;
+DROP TABLE Singer_R1 CASCADE CONSTRAINTS;
+DROP TABLE Singer_R2 CASCADE CONSTRAINTS;
+DROP TABLE Sponsor CASCADE CONSTRAINTS;
+DROP TABLE Audience_Ticket CASCADE CONSTRAINTS;
+DROP TABLE Audience_Info CASCADE CONSTRAINTS;
+DROP TABLE Judge CASCADE CONSTRAINTS;
+DROP TABLE Match_Addr CASCADE CONSTRAINTS;
+DROP TABLE Match_Cap CASCADE CONSTRAINTS;
+DROP TABLE Match_Winner CASCADE CONSTRAINTS;
+DROP TABLE JudgeVote CASCADE CONSTRAINTS;
+DROP TABLE AudienceVote CASCADE CONSTRAINTS;
+DROP TABLE Supports CASCADE CONSTRAINTS;
+
 CREATE TABLE Artist (
     artistID INTEGER,
     artist_name VARCHAR(30) NOT NULL,
@@ -8,7 +27,7 @@ CREATE TABLE Song (
     genre VARCHAR(20),
     artistID INTEGER NOT NULL,
     PRIMARY KEY (song_name),
-    FOREIGN KEY(artistID) REFERENCES Artist(artistID)
+    FOREIGN KEY(artistID) REFERENCES Artist(artistID) ON DELETE CASCADE
 );
 CREATE TABLE Match_Date (
     matchID INTEGER,
@@ -21,8 +40,8 @@ CREATE TABLE Performer_Group (
     matchID INTEGER NOT NULL,
     song_name VARCHAR(30) NOT NULL,
     PRIMARY KEY (groupID),
-    FOREIGN KEY (matchID) REFERENCES Match_Date(matchID),
-    FOREIGN KEY (song_name) REFERENCES Song(song_name)
+    FOREIGN KEY (matchID) REFERENCES Match_Date(matchID) ON DELETE CASCADE,
+    FOREIGN KEY (song_name) REFERENCES Song(song_name) ON DELETE CASCADE
 );
 CREATE TABLE Performer (
     performerID INTEGER,
@@ -31,14 +50,14 @@ CREATE TABLE Performer (
     num_fans INTEGER,
     groupID INTEGER NOT NULL,
     PRIMARY KEY (performerID),
-    FOREIGN KEY (groupID) REFERENCES Performer_Group(groupID)
+    FOREIGN KEY (groupID) REFERENCES Performer_Group(groupID) ON DELETE CASCADE
 );
 
 CREATE TABLE Band (
     num_avail_instr INTEGER,
     performerID INTEGER NOT NULL,
     PRIMARY KEY (performerID),
-    FOREIGN KEY (performerID) REFERENCES Performer(performerID)
+    FOREIGN KEY (performerID) REFERENCES Performer(performerID) ON DELETE CASCADE
 );
 
 CREATE TABLE Singer_R1 (
@@ -47,14 +66,14 @@ CREATE TABLE Singer_R1 (
     number_votes INTEGER,
     birth_date DATE UNIQUE,
     PRIMARY KEY (performerID),
-    FOREIGN KEY (performerID) REFERENCES Performer(performerID)
+    FOREIGN KEY (performerID) REFERENCES Performer(performerID) ON DELETE CASCADE
 );
 
 CREATE TABLE Singer_R2 (
     birth_date DATE,
     age INTEGER,
     PRIMARY KEY (birth_date),
-    FOREIGN KEY (birth_date) REFERENCES Singer_R1(birth_date)
+    FOREIGN KEY (birth_date) REFERENCES Singer_R1(birth_date) ON DELETE CASCADE
 );
 
 CREATE TABLE Sponsor (
@@ -76,7 +95,7 @@ CREATE TABLE Audience_Ticket (
     ticket_type VARCHAR(20),
     fee INTEGER,
     PRIMARY KEY (ticket_type),
-    FOREIGN KEY (ticket_type) REFERENCES Audience_Info(ticket_type)
+    FOREIGN KEY (ticket_type) REFERENCES Audience_Info(ticket_type) ON DELETE CASCADE
 );
 
 CREATE TABLE Judge (
@@ -90,46 +109,46 @@ CREATE TABLE Match_Addr (
     mdate DATE,
     match_location VARCHAR(30) UNIQUE,
     PRIMARY KEY (mdate),
-    FOREIGN KEY (mdate) REFERENCES Match_Date(mdate)
+    FOREIGN KEY (mdate) REFERENCES Match_Date(mdate) ON DELETE CASCADE
 );
 
 CREATE TABLE Match_Cap (
     match_location VARCHAR(30),
     capacity INTEGER,
     PRIMARY KEY (match_location),
-    FOREIGN KEY (match_location) REFERENCES Match_Addr(match_location)
+    FOREIGN KEY (match_location) REFERENCES Match_Addr(match_location) ON DELETE CASCADE
 );
 
 CREATE TABLE Match_Winner (
-    performerID INTEGER,
+    winnerID INTEGER,
     category VARCHAR(30),
     matchID INTEGER,
     PRIMARY KEY (category, matchID),
-    FOREIGN KEY (matchID) REFERENCES Match_Date(matchID)
+    FOREIGN KEY (matchID) REFERENCES Match_Date(matchID) ON DELETE CASCADE
 );
 
 CREATE TABLE JudgeVote (
     judgeID INTEGER,
     groupID INTEGER,
     PRIMARY KEY (judgeID, groupID),
-    FOREIGN KEY (judgeID) REFERENCES Judge(judgeID),
-    FOREIGN KEY (groupID) REFERENCES Performer_Group(groupID)
+    FOREIGN KEY (judgeID) REFERENCES Judge(judgeID) ON DELETE CASCADE,
+    FOREIGN KEY (groupID) REFERENCES Performer_Group(groupID) ON DELETE CASCADE
 );
 
 CREATE TABLE AudienceVote (
     audienceID INTEGER,
     performerID INTEGER,
     PRIMARY KEY (audienceID, performerID),
-    FOREIGN KEY (audienceID) REFERENCES Audience_Info(audienceID),
-    FOREIGN KEY (performerID) REFERENCES Performer(performerID)
+    FOREIGN KEY (audienceID) REFERENCES Audience_Info(audienceID)  ON DELETE CASCADE,
+    FOREIGN KEY (performerID) REFERENCES Performer(performerID) ON DELETE CASCADE
 );
 
 CREATE TABLE Supports (
     company_name VARCHAR(30),
     matchID INTEGER,
     PRIMARY KEY (company_name, matchID),
-    FOREIGN KEY (company_name) REFERENCES Sponsor(company_name),
-    FOREIGN KEY (matchID) REFERENCES Match_Date(matchID)
+    FOREIGN KEY (company_name) REFERENCES Sponsor(company_name) ON DELETE CASCADE,
+    FOREIGN KEY (matchID) REFERENCES Match_Date(matchID) ON DELETE CASCADE
 );
 
 INSERT INTO Artist VALUES (6000, 'Adele');

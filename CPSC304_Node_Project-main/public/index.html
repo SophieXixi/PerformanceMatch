@@ -36,8 +36,8 @@
 
 <br><hr><!-- ========================================================================= -->
 <div class="container1">
-<!-- Show 'Performer'.
-Data will be fetched and inserted here dynamically using JavaScript. -->
+    <!-- Show 'Performer'.
+    Data will be fetched and inserted here dynamically using JavaScript. -->
     <div class="table1">
         <h2>Show Performer</h2>
         <table id="performer_table" border="1">
@@ -56,8 +56,8 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
         </table>
     </div>
 
-<!-- Show 'Performer_Group'.
-Data will be fetched and inserted here dynamically using JavaScript. -->
+    <!-- Show 'Performer_Group'.
+    Data will be fetched and inserted here dynamically using JavaScript. -->
     <div class="table2">
         <h2>Show Performer_Group</h2>
         <table id="performer_group_table" border="1">
@@ -74,8 +74,8 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
             </tbody>
         </table>
     </div>
-<!-- Show 'Match_Date'.
-Data will be fetched and inserted here dynamically using JavaScript. -->
+    <!-- Show 'Match_Date'.
+    Data will be fetched and inserted here dynamically using JavaScript. -->
     <div class="table3">
         <h2>Show Match_Date</h2>
         <table id="match_date_table" border="1">
@@ -92,36 +92,36 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
     </div>
 </div>
 <div class="container2">
-<!-- Show 'Song'.
-Data will be fetched and inserted here dynamically using JavaScript. -->
-<h2>Show Song</h2>
-<table id="song_table" border="1">
-    <thead>
-    <tr>
-        <!--Table head, need to be adjusted accordingly to align with your own.-->
-        <th class="primary-key">Song Name</th>
-        <th>Genre</th>
-        <th class="foreign-key">Artist ID</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+    <!-- Show 'Song'.
+    Data will be fetched and inserted here dynamically using JavaScript. -->
+    <h2>Show Song</h2>
+    <table id="song_table" border="1">
+        <thead>
+        <tr>
+            <!--Table head, need to be adjusted accordingly to align with your own.-->
+            <th class="primary-key">Song Name</th>
+            <th>Genre</th>
+            <th class="foreign-key">Artist ID</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
-<!-- Show 'Artist'.
-Data will be fetched and inserted here dynamically using JavaScript. -->
-<h2>Show Artist</h2>
-<table id="artist_table" border="1">
-    <thead>
-    <tr>
-        <!--Table head, need to be adjusted accordingly to align with your own.-->
-        <th class="primary-key">Artist ID</th>
-        <th>Artist Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+    <!-- Show 'Artist'.
+    Data will be fetched and inserted here dynamically using JavaScript. -->
+    <h2>Show Artist</h2>
+    <table id="artist_table" border="1">
+        <thead>
+        <tr>
+            <!--Table head, need to be adjusted accordingly to align with your own.-->
+            <th class="primary-key">Artist ID</th>
+            <th>Artist Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 </div>
 
 <br><hr><br> <!-- ========================================================================= -->
@@ -162,7 +162,7 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
     delete all samples with conditions:<br>
     his/her/their id is <input type="number" id="deletePerformerID"  placeholder="Enter ID"><br>
     his/her/their name is <input type="text" id="deletePerformerName" placeholder="Enter name"><br>
-    his/her/their debut year 
+    his/her/their debut year
     <select id="debutYearConstraint" name="debutYearConstraint">
         <option value=" "> </option>
         <option value="<">before</option>
@@ -202,7 +202,7 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
                 <option value="<="><=</option>
                 <option value=">=">>=</option>
             </select>
-            
+
             <input type="text" class="value-input" placeholder="Value">
 
         </div>
@@ -244,7 +244,7 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 <div id="aggregationGroupbyResultMsg"></div> <br>
 
 <h2>2.1.8 Aggregation with HAVING  Group fan count by minimum number of fans </h2>
-<p> Find the total number of fans per group with a minimum number of fans per performer</p>
+<p> Find the summed number of fans per group which are above or equal to a user inputted minimum amount of fans</p>
 <form id="performerGroupByFanCount">
     Minimum Fans: <input type="number" id="minFans" placeholder="Enter minimum fans" required> <br><br>
     <button type="submit">Find Fans</button> <br>
@@ -253,28 +253,28 @@ Data will be fetched and inserted here dynamically using JavaScript. -->
 
 <h2> 2.1.9 Nested aggregation with group by</h2>
 <form id="nestedAggregation">
-    For each 
+    For each
     <select id="nestedAggregationGroupBy">
         <option value="debut_year"> debut year </option>
         <option value="groupID"> group </option>
-    </select> for which the 
+    </select> for which the
     <select id="nestedAggregationFansGroupSign">
         <option value="MAX"> max </option>
         <option value="MIN"> min </option>
         <option value="avg"> avg </option>
         <option value="SUM"> sum </option>
-    </select> of fans of the performers is 
+    </select> of fans of the performers is
     <select id="nestedAggregationFansGroupConstraint">
         <option value=">"> larger than </option>
         <option value="="> is equal to </option>
         <option value="<"> fewer than </option>
-    </select> the 
+    </select> the
     <select id="nestedAggregationFansGeneralSign">
         <option value="MAX"> max </option>
         <option value="MIN"> min </option>
         <option value="avg"> avg </option>
         <option value="SUM"> sum </option>
-    </select> of the number of fans of all the performers, 
+    </select> of the number of fans of all the performers,
     I would like to know : <br>
     <input type="checkbox" id="nestedAggregationID" name="nestedAggregationCount" value="COUNT(P.performerID)">
     <label for="nestedAggregationID">the number of performers</label><br>
